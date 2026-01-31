@@ -1,3 +1,24 @@
 spring:
   application:
     name: gestor-balance-dialisis
+  datasource:
+    url: 'jdbc:postgresql://localhost:5432/gestor_dialisis'
+    username: 'alfredoroque'
+    password: ''
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update   # create | create-drop | validate | none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: never
+
+server:
+  port: 8080
