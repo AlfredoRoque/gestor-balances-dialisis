@@ -1,4 +1,4 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.dto;
 
-public class UsuarioDTO {
+public class FluidBalanceResponse {
 }
