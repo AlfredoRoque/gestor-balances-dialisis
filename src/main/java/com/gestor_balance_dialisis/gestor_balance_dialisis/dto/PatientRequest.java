@@ -25,23 +25,23 @@ public class PatientRequest implements Serializable {
 
     private Long id;
 
-    @Schema(description = "Username email", example = "user123")
+    @Schema(description = "Patient age", example = "30")
     @NotNull(message = "Username is required")
     private int age;
 
-    @Schema(description = "Username email", example = "user123")
-    @NotBlank(message = "Username is required")
-    @NotNull(message = "Username is required")
+    @Schema(description = "Patient name", example = "John Doe")
+    @NotBlank(message = "Patient name is required")
+    @NotNull(message = "Patient name is required")
     private String name;
 
     @Schema(description = "Patient status", example = "ACTIVO")
     private String status;
 
-    @Schema(description = "Username email", example = "user123")
-    @NotNull(message = "Username is required")
+    @Schema(description = "Patient user id", example = "1")
+    @NotNull(message = "Patient user id is required")
     private Long userId;
 
-    @Schema(description = "Username email", example = "user123")
-    @NotNull(message = "Username is required")
+    @Schema(description = "Patient bag type id", example = "1")
+    @NotNull(message = "Patient bag type id is required")
     private Long bagTypeId;
 }

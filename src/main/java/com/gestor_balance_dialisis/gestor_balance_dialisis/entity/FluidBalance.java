@@ -1,8 +1,11 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.FluidBalanceRequest;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -16,6 +19,8 @@ import java.util.Date;
 @Table(name = "balance_liquido")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class FluidBalance {
 
     @Id
@@ -39,4 +44,17 @@ public class FluidBalance {
 
     @Column(name = "descripcion_liquido", nullable = false)
     private String liquidDescription;
+
+    /**
+     * Constructor that initializes the FluidBalance entity based on a FluidBalanceRequest DTO.
+     *
+     * @param fluidBalanceRequest the FluidBalanceRequest DTO containing the data
+     */
+    public FluidBalance(FluidBalanceRequest fluidBalanceRequest) {
+        this.date = fluidBalanceRequest.getDate();
+        this.drained = fluidBalanceRequest.getDrained();
+        this.infused = fluidBalanceRequest.getInfused();
+        this.liquidDescription = fluidBalanceRequest.getDescriptionFluid();
+        this.patient = new Patient(fluidBalanceRequest.getPatientId());
+    }
 }

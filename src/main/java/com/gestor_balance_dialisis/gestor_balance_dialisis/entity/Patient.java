@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PatientRequest;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -78,5 +79,14 @@ public class Patient {
         this.setStatus(Objects.nonNull(patientRequest.getStatus())?StatusEnum.valueOf(patientRequest.getStatus()):this.status);
         this.setUser(new User(patientRequest.getUserId()));
         this.setBagType(new BagType(patientRequest.getBagTypeId()));
+    }
+
+    /**
+     * Constructor to create a Patient entity with only the patient ID.
+     *
+     * @param patientId the ID of the patient
+     */
+    public Patient(@NotNull(message = "Patient id is required") Long patientId) {
+        this.id = patientId;
     }
 }

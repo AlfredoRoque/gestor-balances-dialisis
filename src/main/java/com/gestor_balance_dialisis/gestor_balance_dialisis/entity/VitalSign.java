@@ -1,7 +1,11 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.entity;
 
+import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.VitalSignRequest;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -12,6 +16,8 @@ import lombok.Setter;
 @Table(name = "signo_vital")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class VitalSign {
 
     @Id
@@ -21,4 +27,23 @@ public class VitalSign {
 
     @Column(name = "nombre", nullable = false, length = 150)
     private String name;
+
+    /**
+     * Constructs a VitalSign entity from a VitalSignRequest DTO.
+     *
+     * @param vitalSignRequest the request containing the vital sign information
+     */
+    public VitalSign(VitalSignRequest vitalSignRequest) {
+        this.id = vitalSignRequest.getId();
+        this.name = vitalSignRequest.getName();
+    }
+
+    /**
+     * Constructs a VitalSign entity with only the id.
+     *
+     * @param vitalSign the id of the vital sign
+     */
+    public VitalSign(@NotNull(message = "Vital sign id is required") Long vitalSign) {
+        this.id = vitalSign;
+    }
 }
