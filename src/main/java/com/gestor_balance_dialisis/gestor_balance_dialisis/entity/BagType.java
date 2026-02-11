@@ -1,5 +1,6 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.entity;
 
+import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.BagTypeRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,5 +38,17 @@ public class BagType {
      */
     public BagType(Long id) {
         this.setId(id);
+    }
+
+    /**
+     * Constructor to create a BagType instance from a BagTypeRequest DTO.
+     * This allows for easy conversion from the request data to the entity model.
+     *
+     * @param bagTypeRequest the request containing the bag type information
+     */
+    public BagType(BagTypeRequest bagTypeRequest) {
+        this.setId(bagTypeRequest.getId());
+        this.setType(bagTypeRequest.getType());
+        this.setDescription(bagTypeRequest.getDescription());
     }
 }

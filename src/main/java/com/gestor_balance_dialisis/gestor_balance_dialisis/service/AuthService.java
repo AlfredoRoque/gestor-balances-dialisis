@@ -48,12 +48,10 @@ public class AuthService {
      * Validate if the email exists in the system, returns true if it exists, otherwise throws an exception.
      *
      * @param validateMailRequestModel The request containing the email to be validated.
-     * @return true if the email exists, otherwise an exception is thrown.
      * @throws BalanceGlobalException if the email does not exist.
      */
-    public Boolean validateMail(ValidateMailRequestModel validateMailRequestModel) {
+    public void validateMail(ValidateMailRequestModel validateMailRequestModel) {
         userService.findByEmail(validateMailRequestModel.getEmail());
-        return true;
     }
 
     /**

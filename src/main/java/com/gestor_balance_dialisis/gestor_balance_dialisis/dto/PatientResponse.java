@@ -36,8 +36,8 @@ public class PatientResponse implements Serializable {
     @Schema(description = "Patient user id", example = "1")
     private Long userId;
 
-    @Schema(description = "Patient bag type id", example = "1")
-    private Long bagTypeId;
+    @Schema(description = "Patient bag type", example = "{\"id\": 1, \"type\": \"1.5\", \"description\": \"Description of the bag type\"}")
+    private BagTypeResponse bagType;
 
     @Schema(description = "Patient status", example = "ACTIVO")
     private String status;
@@ -53,6 +53,6 @@ public class PatientResponse implements Serializable {
         this.setName(patient.getName());
         this.setStatus(patient.getStatus().name());
         this.setUserId(patient.getUser().getId());
-        this.setBagTypeId(patient.getBagType().getId());
+        this.setBagType(new BagTypeResponse(patient.getBagType()));
     }
 }

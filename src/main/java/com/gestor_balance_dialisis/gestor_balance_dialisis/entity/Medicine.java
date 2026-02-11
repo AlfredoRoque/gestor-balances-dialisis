@@ -2,6 +2,7 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.entity;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.MedicineRequest;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,5 +35,14 @@ public class Medicine {
     public Medicine(MedicineRequest medicineRequest) {
         this.id = medicineRequest.getId();
         this.name = medicineRequest.getName();
+    }
+
+    /**
+     * Constructs a Medicine entity with only the ID.
+     *
+     * @param medicineId the ID of the medicine
+     */
+    public Medicine(@NotNull(message = "") Long medicineId) {
+        this.id = medicineId;
     }
 }

@@ -6,8 +6,6 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.RecoverPasswordRe
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.ValidateMailRequestModel;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -36,11 +34,6 @@ public class AuthController {
             summary = "User login",
             description = "Authenticate a user with username and password, returns a JWT token if successful."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful login"),
-            @ApiResponse(responseCode = "401", description = "Invalid credentials"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
@@ -50,20 +43,16 @@ public class AuthController {
      * Validate if the email exists in the system, returns true if it exists, otherwise throws an exception.
      *
      * @param validateMailRequestModel The request containing the email to be validated.
-     * @return A response entity containing true if the email exists, otherwise an exception is thrown.
+     * @return otherwise an exception is thrown.
      */
     @Operation(
             summary = "Validate if email exists",
             description = "Validate if the email exists in the system, returns true if it exists, otherwise throws an exception."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful validation"),
-            @ApiResponse(responseCode = "401", description = "Invalid credentials"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
     @PostMapping("/validate/mail")
-    public ResponseEntity<Boolean> validateMail(@Valid @RequestBody ValidateMailRequestModel validateMailRequestModel) {
-        return ResponseEntity.ok(authService.validateMail(validateMailRequestModel));
+    public ResponseEntity<Void> validateMail(@Valid @RequestBody ValidateMailRequestModel validateMailRequestModel) {
+        authService.validateMail(validateMailRequestModel);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -74,12 +63,9 @@ public class AuthController {
             summary = "Recover password",
             description = "Recover password for a user, returns true if the email exists and the recovery process is initiated, otherwise throws an exception."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful password recovery initiation"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
     @PostMapping("/recover/password")
-    public void recoverPassword(@Valid @RequestBody RecoverPasswordRequest recoverPasswordRequest) throws MessagingException {
+    public ResponseEntity<Void> recoverPassword(@Valid @RequestBody RecoverPasswordRequest recoverPasswordRequest) throws MessagingException {
         authService.recoverPassword(recoverPasswordRequest);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -4,14 +4,13 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PatientRequest;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PatientResponse;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,14 +28,9 @@ public class PatientController {
      * @return ResponseEntity containing the saved patient response
      */
     @Operation(summary = "Save a new patient", description = "Endpoint to save a new patient with the provided information.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Patient saved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-    })
     @PostMapping("/save")
     public ResponseEntity<PatientResponse> saveUser(@Valid @RequestBody PatientRequest patientRequest) {
-        return ResponseEntity.ok(patientService.save(patientRequest));
+        return ResponseEntity.created(URI.create("/api/patients/save" + patientRequest.getId())).body(patientService.save(patientRequest));
     }
 
     /**
@@ -46,11 +40,6 @@ public class PatientController {
      * @return ResponseEntity containing a list of patient responses associated with the user ID
      */
     @Operation(summary = "Get patients for a user", description = "Endpoint to retrieve patients associated with a specific user ID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Patients retrieved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-    })
     @GetMapping("/users/{userId}")
     public ResponseEntity<List<PatientResponse>> getPatientsForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(patientService.findByUserId(userId));

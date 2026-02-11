@@ -35,7 +35,7 @@ public class VitalSignDetailResponse implements Serializable {
     private Date date;
 
     @Schema(description = "Vital sign id", example = "1")
-    private Long vitalSign;
+    private VitalSignResponse vitalSign;
 
     @Schema(description = "Vital sign detail value", example = "120/80")
     private String value;
@@ -52,7 +52,7 @@ public class VitalSignDetailResponse implements Serializable {
         this.id = vitalSignDetail.getId();
         this.patient = vitalSignDetail.getPatient().getId();
         this.date = vitalSignDetail.getDate();
-        this.vitalSign = vitalSignDetail.getVitalSign().getId();
+        this.vitalSign = new VitalSignResponse(vitalSignDetail.getVitalSign());
         this.value = vitalSignDetail.getValue();
         this.status = vitalSignDetail.getStatus();
     }

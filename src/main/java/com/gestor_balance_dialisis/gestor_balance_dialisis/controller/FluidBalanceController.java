@@ -4,8 +4,6 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.FluidBalanceReque
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.FluidBalanceResponse;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.service.FluidBalanceService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,14 +33,9 @@ public class FluidBalanceController {
      * @return ResponseEntity containing the saved fluid balance response
      */
     @Operation(summary = "Save a new fluid balance", description = "Endpoint to save a new fluid balance record with the provided information.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Fluid balance saved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-    })
     @PostMapping("/save")
     public ResponseEntity<FluidBalanceResponse> saveFluidBalance(@Valid @RequestBody FluidBalanceRequest fluidBalanceRequest) {
-        return ResponseEntity.ok(fluidBalanceService.save(fluidBalanceRequest));
+        return ResponseEntity.created(URI.create("/fluid-balances/save")).body(fluidBalanceService.save(fluidBalanceRequest));
     }
 
     /**
@@ -55,11 +49,6 @@ public class FluidBalanceController {
      */
     @Operation(summary = "Get fluid balances by dates and patient", description = "Endpoint to retrieve fluid balance records based on the provided date range and patient ID. The end date is optional; " +
             "if not provided, it will default to the end of the day of the start date.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Fluid balances retrieved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-    })
     @GetMapping("/dates")
     public ResponseEntity<List<FluidBalanceResponse>> getFluidBalanceByDateAndPatient(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @RequestParam(required = false) LocalDateTime endDate,

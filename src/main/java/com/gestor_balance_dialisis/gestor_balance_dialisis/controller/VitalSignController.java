@@ -3,14 +3,13 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.controller;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.*;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.service.VitalSignService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -31,14 +30,9 @@ public class VitalSignController {
      * @return A ResponseEntity containing the saved vital sign response and an HTTP status code.
      */
     @Operation(summary = "Save a new vital sign", description = "Endpoint to save a new vital sign with the provided information.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Vital sign saved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-    })
     @PostMapping("/save")
     public ResponseEntity<VitalSignResponse> saveVitalSign(@Valid @RequestBody VitalSignRequest vitalSignRequest) {
-        return ResponseEntity.ok(vitalSignService.save(vitalSignRequest));
+        return ResponseEntity.created(URI.create("/api/vital-signs/save")).body(vitalSignService.save(vitalSignRequest));
     }
 
     /**
@@ -47,11 +41,6 @@ public class VitalSignController {
      * @return A ResponseEntity containing a list of vital sign responses and an HTTP status code.
      */
     @Operation(summary = "Get all vital signs", description = "Endpoint to retrieve all vital signs available in the system.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Vital sign retrieved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-    })
     @GetMapping
     public ResponseEntity<List<VitalSignResponse>> getAllVitalSigns() {
         return ResponseEntity.ok(vitalSignService.getAllVitalSigns());
@@ -64,14 +53,9 @@ public class VitalSignController {
      * @return A ResponseEntity containing the saved vital sign detail response and an HTTP status code.
      */
     @Operation(summary = "Save vital sign detail", description = "Endpoint to save a new vital sign detail with the provided information.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Vital sign detail saved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-    })
     @PostMapping("/details/save")
     public ResponseEntity<VitalSignDetailResponse> saveVitalSignDetail(@Valid @RequestBody VitalSignDetailRequest vitalSignDetailRequest) {
-        return ResponseEntity.ok(vitalSignService.saveVitalSignDetail(vitalSignDetailRequest));
+        return ResponseEntity.created(URI.create("/api/vital-signs/details/save")).body(vitalSignService.saveVitalSignDetail(vitalSignDetailRequest));
     }
 
     /**
@@ -81,13 +65,20 @@ public class VitalSignController {
      * @return A ResponseEntity containing the updated vital sign detail response and an HTTP status code.
      */
     @Operation(summary = "Update vital sign detail", description = "Endpoint to update a vital sign detail with the provided information.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Vital sign detail updated successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-    })
     @PatchMapping("/details/update")
     public ResponseEntity<VitalSignDetailResponse> updateVitalSignDetail(@Valid @RequestBody VitalSignDetailUpdateRequest vitalSignDetailUpdateRequest) {
         return ResponseEntity.ok(vitalSignService.updateVitalSignDetail(vitalSignDetailUpdateRequest));
+    }
+
+    /**
+     * Endpoint to retrieve vital sign details for a specific patient based on the actual date.
+     *
+     * @param patientId The ID of the patient for whom to retrieve the vital sign details.
+     * @return A ResponseEntity containing a list of vital sign detail responses and an HTTP status code.
+     */
+    @Operation(summary = "Get vital sign detail for actual date and patient", description = "Endpoint to retrieve vital sign details for a specific patient based on the actual date.")
+    @GetMapping("/details/patients/actual-date/{patientId}")
+    public ResponseEntity<List<VitalSignDetailResponse>> getVitalSignDetailByActualDateAndPatient(@PathVariable Long patientId) {
+        return ResponseEntity.ok(vitalSignService.getVitalSignDetailByActualDateAndPatient(patientId));
     }
 }

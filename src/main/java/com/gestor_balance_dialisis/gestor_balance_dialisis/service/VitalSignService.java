@@ -3,14 +3,17 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.service;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.*;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.VitalSign;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.VitalSignDetail;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.VitalSignDetailRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.VitalSignRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,5 +73,18 @@ public class VitalSignService {
             return new VitalSignDetailResponse(vitalSignDetailRepository.save(new VitalSignDetail(vitalSignDetail.get(), vitalSignDetailUpdateRequest)));
         }
         throw new BalanceGlobalException("Vital sign detail doesn't exist", HttpStatus.CONFLICT.value());
+    }
+
+    /**
+     * Retrieves a list of vital sign detail records for a specific patient based on the actual date and status 'ACTIVO'.
+     *
+     * @param patientId the ID of the patient for whom to retrieve the vital sign details
+     * @return a list of responses containing the information of the vital sign details for the specified patient and date
+     */
+    public List<VitalSignDetailResponse> getVitalSignDetailByActualDateAndPatient(Long patientId) {
+        Date actualDate = new Date();
+        return vitalSignDetailRepository.getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatus(
+                Utility.startDay(actualDate),Utility.endDay(actualDate),patientId, StatusEnum.ACTIVO)
+                .stream().map(VitalSignDetailResponse::new).toList();
     }
 }
