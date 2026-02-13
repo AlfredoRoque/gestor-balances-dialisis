@@ -83,7 +83,7 @@ public class VitalSignService {
      */
     public List<VitalSignDetailResponse> getVitalSignDetailByActualDateAndPatient(Long patientId) {
         Date actualDate = new Date();
-        return vitalSignDetailRepository.getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatus(
+        return vitalSignDetailRepository.getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatusOrderByDateAsc(
                 Utility.startDay(actualDate),Utility.endDay(actualDate),patientId, StatusEnum.ACTIVO)
                 .stream().map(VitalSignDetailResponse::new).toList();
     }

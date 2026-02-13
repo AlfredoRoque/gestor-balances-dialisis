@@ -1,8 +1,11 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.ExtraFluidRequestDto;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -16,6 +19,8 @@ import java.util.Date;
 @Table(name = "liquido_extra")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ExtraFluid {
 
     @Id
@@ -36,4 +41,17 @@ public class ExtraFluid {
 
     @Column(name = "fecha", nullable = false)
     private Date date;
+
+    /**
+     * Constructor to create an ExtraFluid entity from an ExtraFluidRequestDto.
+     *
+     * @param extraFluidRequestDto the DTO containing the information for the extra fluid record
+     */
+    public ExtraFluid(ExtraFluidRequestDto extraFluidRequestDto) {
+        this.id = extraFluidRequestDto.getId();
+        this.patient = new Patient(extraFluidRequestDto.getPatientId());
+        this.urine = extraFluidRequestDto.getUrine();
+        this.ingested = extraFluidRequestDto.getIngested();
+        this.date = extraFluidRequestDto.getDate();
+    }
 }

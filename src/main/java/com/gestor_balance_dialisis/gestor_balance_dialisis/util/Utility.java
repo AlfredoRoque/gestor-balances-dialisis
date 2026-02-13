@@ -78,4 +78,16 @@ public class Utility {
     public Date convertLocalDateTimeToDate(LocalDateTime date) {
         return Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
     }
+
+    /**
+     * Converts a Date object to a LocalDateTime object.
+     *
+     * @param date The Date object to be converted.
+     * @return A LocalDateTime object representing the same point in time as the provided Date.
+     */
+    public LocalDateTime convertDateToLocalDateTime(Date date) {
+        return date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
 }

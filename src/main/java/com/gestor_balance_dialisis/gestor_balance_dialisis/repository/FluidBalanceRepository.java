@@ -14,6 +14,6 @@ import java.util.List;
 @Repository
 public interface FluidBalanceRepository extends JpaRepository<FluidBalance, Long> {
 
-    List<FluidBalance> getFluidBalancesByDateBetweenAndPatientId(Date dateAfter, Date dateBefore, Long patientId);
+    List<FluidBalance> getFluidBalancesByDateBetweenAndPatientIdOrderByDateAsc(Date dateAfter, Date dateBefore, Long patientId);
 
 }

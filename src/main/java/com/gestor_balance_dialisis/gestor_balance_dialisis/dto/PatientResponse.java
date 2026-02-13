@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * PatientResponse is a Data Transfer Object (DTO) that represents the response structure for patient-related operations.
@@ -52,7 +53,7 @@ public class PatientResponse implements Serializable {
         this.setAge(patient.getAge());
         this.setName(patient.getName());
         this.setStatus(patient.getStatus().name());
-        this.setUserId(patient.getUser().getId());
-        this.setBagType(new BagTypeResponse(patient.getBagType()));
+        this.setUserId(Objects.nonNull(patient.getUser())?patient.getUser().getId():null);
+        this.setBagType(Objects.nonNull(patient.getBagType())?new BagTypeResponse(patient.getBagType()):null) ;
     }
 }

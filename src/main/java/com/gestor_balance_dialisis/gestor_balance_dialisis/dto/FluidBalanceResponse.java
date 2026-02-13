@@ -11,6 +11,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * DTO for fluid balance response, containing information about the fluid balance record to be returned in API responses.
@@ -36,11 +37,13 @@ public class FluidBalanceResponse implements Serializable {
     @Schema(description = "Liquid infused", example = "500.00")
     private BigDecimal infused;
 
-    @Schema(description = "Patient id", example = "1")
-    private Long patientId;
+    @Schema(description = "Patient", example = "1")
+    private PatientResponse patient;
 
     @Schema(description = "Fluid description", example = "Description of the fluid balance record")
     private String descriptionFluid;
+
+    private BigDecimal ultrafiltration;
 
     /**
      * Constructor that initializes the FluidBalanceResponse object based on a FluidBalance entity.
@@ -52,7 +55,7 @@ public class FluidBalanceResponse implements Serializable {
         this.date = fluidBalance.getDate();
         this.drained = fluidBalance.getDrained();
         this.infused = fluidBalance.getInfused();
-        this.patientId = fluidBalance.getPatient().getId();
+        this.patient = new PatientResponse(fluidBalance.getPatient());
         this.descriptionFluid = fluidBalance.getLiquidDescription();
     }
 }

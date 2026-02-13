@@ -14,5 +14,5 @@ import java.util.List;
 @Repository
 public interface VitalSignDetailRepository extends JpaRepository<VitalSignDetail, Long> {
 
-    List<VitalSignDetail> getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatus(Date dateAfter, Date dateBefore, Long patientId, StatusEnum status);
+    List<VitalSignDetail> getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatusOrderByDateAsc(Date dateAfter, Date dateBefore, Long patientId, StatusEnum status);
 }

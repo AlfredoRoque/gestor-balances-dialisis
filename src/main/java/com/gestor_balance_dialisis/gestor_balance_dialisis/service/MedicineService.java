@@ -82,7 +82,7 @@ public class MedicineService {
      * @return a list of responses containing the information of the medicine details for the specified patient
      */
     public List<MedicineDetailResponseDto> getVitalSignDetailByPatient(Long patientId) {
-        return medicineDetailRepository.getMedicineDetailByPatientIdAndStatus(patientId, StatusEnum.ACTIVO)
+        return medicineDetailRepository.getMedicineDetailByPatientIdAndStatusOrderByDateAsc(patientId, StatusEnum.ACTIVO)
                 .stream().map(MedicineDetailResponseDto::new).toList();
     }
 }

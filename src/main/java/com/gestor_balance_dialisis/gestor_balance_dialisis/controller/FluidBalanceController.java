@@ -1,5 +1,6 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.controller;
 
+import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.CalculateFluidBalanceResponseDto;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.FluidBalanceRequest;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.FluidBalanceResponse;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.service.FluidBalanceService;
@@ -54,5 +55,34 @@ public class FluidBalanceController {
                                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @RequestParam(required = false) LocalDateTime endDate,
                                                                             @RequestParam Long patientId) {
         return ResponseEntity.ok(fluidBalanceService.getFluidBalanceByDateAndPatient(startDate,endDate,patientId));
+    }
+
+    /**
+     * Endpoint to calculate the fluid balance for a patient based on the provided date range and patient ID.
+     * If the date range is not provided, it will calculate the fluid balance for all records of the patient.
+     *
+     * @param patientId the ID of the patient whose fluid balance is to be calculated (required)
+     * @return ResponseEntity containing a list of CalculateFluidBalanceResponseDto with the calculated fluid balance for the specified patient
+     */
+    @Operation(summary = "Calculate fluid balance for patient", description = "Endpoint to calculate the fluid balance for a patient based on the provided date range and patient ID.")
+    @GetMapping("/calculate/patients/{patientId}")
+    public ResponseEntity<List<CalculateFluidBalanceResponseDto>> calculateBalanceFluidForPatient(@PathVariable Long patientId) {
+        return ResponseEntity.ok(fluidBalanceService.calculateBalanceFluidForPatient(patientId, null, null));
+    }
+
+    /**
+     * Endpoint to calculate the fluid balance for a patient based on the provided date range and patient ID.
+     *
+     * @param startDate the start date for filtering records to be included in the fluid balance calculation (required)
+     * @param endDate   the end date for filtering records to be included in the fluid balance calculation (required)
+     * @param patientId the ID of the patient whose fluid balance is to be calculated (required)
+     * @return ResponseEntity containing a list of CalculateFluidBalanceResponseDto with the calculated fluid balance for the specified patient and date range
+     */
+    @Operation(summary = "Calculate fluid balance for patient", description = "Endpoint to calculate the fluid balance for a patient based on the provided date range and patient ID.")
+    @GetMapping("/calculate/patients/{patientId}/dates")
+    public ResponseEntity<List<CalculateFluidBalanceResponseDto>> calculateBalanceFluidForPatientAndDates(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                                                                            @PathVariable Long patientId) {
+        return ResponseEntity.ok(fluidBalanceService.calculateBalanceFluidForPatient(patientId, startDate, endDate));
     }
 }
