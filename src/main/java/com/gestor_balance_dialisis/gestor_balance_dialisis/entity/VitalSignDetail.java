@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public class VitalSignDetail {
     private Patient patient;
 
     @Column(name = "fecha", nullable = false)
-    private Date date;
+    private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_signo_vital", nullable = false)

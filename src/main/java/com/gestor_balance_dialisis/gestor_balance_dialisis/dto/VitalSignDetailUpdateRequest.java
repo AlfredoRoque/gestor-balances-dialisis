@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -30,7 +31,7 @@ public class VitalSignDetailUpdateRequest implements Serializable {
 
     @Schema(description = "Vital sign detail id date", example = "2024-06-01T12:00:00")
     @NotNull(message = "Date is required")
-    private Date date;
+    private LocalDateTime date;
 
     @Schema(description = "Vital sign detail value", example = "120/80")
     @NotNull(message = "Value is required")

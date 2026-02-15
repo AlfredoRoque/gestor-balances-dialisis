@@ -11,6 +11,7 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -30,7 +31,7 @@ public class FluidBalanceRequest implements Serializable {
 
     @Schema(description = "Fluid balance date", example = "2023-10-01T12:00:00Z")
     @NotNull(message = "Fluid balance date is required")
-    private Date date;
+    private LocalDateTime date;
 
     @Schema(description = "Liquid drained", example = "500.00")
     @NotNull(message = "Liquid drained is required")

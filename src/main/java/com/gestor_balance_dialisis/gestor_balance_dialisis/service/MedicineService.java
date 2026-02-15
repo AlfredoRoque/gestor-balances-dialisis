@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +71,7 @@ public class MedicineService {
         Optional<MedicineDetail> medicineDetail = medicineDetailRepository.findById(medicineDetailUpdateRequestDto.getId());
         if(medicineDetail.isPresent()){
             return new MedicineDetailResponseDto(medicineDetailRepository.save(new MedicineDetail(
-                    medicineDetail.get(), medicineDetailUpdateRequestDto, new Date())));
+                    medicineDetail.get(), medicineDetailUpdateRequestDto, LocalDateTime.now())));
         }
         throw new BalanceGlobalException("Medicine detail doesn't exist", HttpStatus.CONFLICT.value());
     }

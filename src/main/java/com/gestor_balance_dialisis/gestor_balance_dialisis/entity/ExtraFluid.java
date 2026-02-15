@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -40,7 +41,7 @@ public class ExtraFluid {
     private BigDecimal ingested;
 
     @Column(name = "fecha", nullable = false)
-    private Date date;
+    private LocalDateTime date;
 
     /**
      * Constructor to create an ExtraFluid entity from an ExtraFluidRequestDto.

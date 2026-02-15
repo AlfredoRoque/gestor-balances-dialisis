@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class ExtraFluidService {
      * @return a list of responses containing the extra fluid information for the specified patient and date
      */
     public List<ExtraFluidResponseDto> getExtraFluidByActualDateAndPatient(Long patientId) {
-        Date actualDate = new Date();
+        LocalDateTime actualDate = LocalDateTime.now();
         return extraFluidRepository.getExtraFluidByDateIsBetweenAndPatientId(
                         Utility.startDay(actualDate),Utility.endDay(actualDate),patientId)
                 .stream().map(ExtraFluidResponseDto::new).toList();

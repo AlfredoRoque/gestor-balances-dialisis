@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -32,7 +33,7 @@ public class MedicineDetailResponseDto implements Serializable {
     private Long patientId;
 
     @Schema(description = "Registration date", example = "2023-10-01T12:00:00Z")
-    private Date date;
+    private LocalDateTime date;
 
     @Schema(description = "Medicine id", example = "1")
     private MedicineResponse medicine;
@@ -44,13 +45,15 @@ public class MedicineDetailResponseDto implements Serializable {
     private String frequency;
 
     @Schema(description = "Modification date", example = "2023-10-01T12:00:00Z")
-    private Date modificationDate;
+    private LocalDateTime modificationDate;
 
     @Schema(description = "Deletion date", example = "2023-10-01T12:00:00Z")
-    private Date deletionDate;
+    private LocalDateTime deletionDate;
 
     @Schema(description = "Medicine detail status", example = "ACTIVO")
     private StatusEnum status;
+
+    private String day;
 
     /**
      * Constructor to create a MedicineDetailResponseDto from a MedicineDetail entity.

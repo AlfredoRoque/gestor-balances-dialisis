@@ -1,5 +1,6 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.config;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -7,6 +8,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import java.util.TimeZone;
 
 @Configuration
 public class CorsConfig {
@@ -26,5 +28,10 @@ public class CorsConfig {
         source.registerCorsConfiguration("/**", config);
 
         return source;
+    }
+
+    @PostConstruct
+    public void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 }

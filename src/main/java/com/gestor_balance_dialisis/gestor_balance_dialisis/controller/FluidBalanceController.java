@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -84,5 +86,45 @@ public class FluidBalanceController {
                                                                                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
                                                                                             @PathVariable Long patientId) {
         return ResponseEntity.ok(fluidBalanceService.calculateBalanceFluidForPatient(patientId, startDate, endDate));
+    }
+
+    /**
+     * Endpoint to generate a PDF report with the calculated fluid balance for a patient based on the provided date range and patient ID.
+     *
+     * @param startDate the start date for filtering records to be included in the fluid balance calculation (optional)
+     * @param endDate   the end date for filtering records to be included in the fluid balance calculation (optional)
+     * @param patientId the ID of the patient for whom the PDF report is to be generated (required)
+     * @return ResponseEntity containing the generated PDF report as a byte array, along with appropriate headers for file download
+     * @throws Exception if an error occurs during PDF generation
+     */
+    @Operation(summary = "Generate pdf whit calculate fluid balance for patient", description = "Endpoint to generate a PDF report with the calculated fluid balance for a patient based on the provided date range and patient ID.")
+    @GetMapping("/reports/balances/patients/{patientId}/dates")
+    public ResponseEntity<byte[]> getReportBalanceFluidForPatient(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                                                   @PathVariable Long patientId) throws Exception {
+        List<Object> response = fluidBalanceService.getReportBalanceFluidForPatient(patientId, startDate, endDate);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+response.get(2))
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentLength((Integer) response.get(1))
+                .body((byte[]) response.get(0));
+    }
+
+    /**
+     * Endpoint to generate a PDF report with the calculated fluid balance for a patient based on the provided date range and patient ID, and send it to the patient's email.
+     *
+     * @param startDate the start date for filtering records to be included in the fluid balance calculation (optional)
+     * @param endDate   the end date for filtering records to be included in the fluid balance calculation (optional)
+     * @param patientId the ID of the patient for whom the PDF report is to be generated and sent via email (required)
+     * @return ResponseEntity with no content, indicating that the email has been sent successfully
+     * @throws Exception if an error occurs during PDF generation or email sending
+     */
+    @Operation(summary = "Generate pdf whit calculate fluid balance for patient and sed to email", description = "Endpoint to generate a PDF report with the calculated fluid balance for a patient based on the provided date range and patient ID, and send it to the patient's email.")
+    @GetMapping("/reports/balances/patients/{patientId}/dates/email")
+    public ResponseEntity<Void> sendReportBalanceFluidForPatientToEmail(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                                                  @PathVariable Long patientId) throws Exception {
+        fluidBalanceService.sendReportBalanceFluidForPatientToEmail(patientId, startDate, endDate);
+        return ResponseEntity.noContent().build();
     }
 }

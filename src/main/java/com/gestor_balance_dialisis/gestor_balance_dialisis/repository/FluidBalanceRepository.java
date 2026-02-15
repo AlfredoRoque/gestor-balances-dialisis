@@ -4,6 +4,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.FluidBalance;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +15,6 @@ import java.util.List;
 @Repository
 public interface FluidBalanceRepository extends JpaRepository<FluidBalance, Long> {
 
-    List<FluidBalance> getFluidBalancesByDateBetweenAndPatientIdOrderByDateAsc(Date dateAfter, Date dateBefore, Long patientId);
+    List<FluidBalance> getFluidBalancesByDateBetweenAndPatientIdOrderByDateAsc(LocalDateTime dateAfter, LocalDateTime dateBefore, Long patientId);
 
 }

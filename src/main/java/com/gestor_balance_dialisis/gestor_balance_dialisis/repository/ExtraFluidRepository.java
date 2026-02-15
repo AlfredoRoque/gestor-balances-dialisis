@@ -4,6 +4,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.ExtraFluid;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,5 +15,5 @@ import java.util.List;
 @Repository
 public interface ExtraFluidRepository extends JpaRepository<ExtraFluid, Long> {
 
-    List<ExtraFluid> getExtraFluidByDateIsBetweenAndPatientId(Date dateAfter, Date dateBefore, Long patientId);
+    List<ExtraFluid> getExtraFluidByDateIsBetweenAndPatientId(LocalDateTime dateAfter, LocalDateTime dateBefore, Long patientId);
 }

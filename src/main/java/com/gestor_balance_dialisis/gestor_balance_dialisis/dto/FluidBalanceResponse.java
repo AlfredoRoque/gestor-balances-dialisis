@@ -10,8 +10,8 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 
 /**
  * DTO for fluid balance response, containing information about the fluid balance record to be returned in API responses.
@@ -20,7 +20,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FluidBalanceResponse implements Serializable {
+public class  FluidBalanceResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -29,7 +29,7 @@ public class FluidBalanceResponse implements Serializable {
     private Long id;
 
     @Schema(description = "Fluid balance date", example = "2023-10-01T12:00:00Z")
-    private Date date;
+    private LocalDateTime date;
 
     @Schema(description = "Liquid drained", example = "500.00")
     private BigDecimal drained;
@@ -44,6 +44,13 @@ public class FluidBalanceResponse implements Serializable {
     private String descriptionFluid;
 
     private BigDecimal ultrafiltration;
+    private int changeNumber;
+    private BigDecimal totalUrine;
+    private BigDecimal totalIngested;
+    private BigDecimal partialBalance;
+    private BigDecimal totalBalance;
+    private String hour;
+    private String day;
 
     /**
      * Constructor that initializes the FluidBalanceResponse object based on a FluidBalance entity.

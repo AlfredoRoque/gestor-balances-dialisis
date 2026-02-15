@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +83,7 @@ public class VitalSignService {
      * @return a list of responses containing the information of the vital sign details for the specified patient and date
      */
     public List<VitalSignDetailResponse> getVitalSignDetailByActualDateAndPatient(Long patientId) {
-        Date actualDate = new Date();
+        LocalDateTime actualDate = LocalDateTime.now();
         return vitalSignDetailRepository.getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatusOrderByDateAsc(
                 Utility.startDay(actualDate),Utility.endDay(actualDate),patientId, StatusEnum.ACTIVO)
                 .stream().map(VitalSignDetailResponse::new).toList();
