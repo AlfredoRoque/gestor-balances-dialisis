@@ -2,8 +2,6 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.controller;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.JwtResponse;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.LoginRequest;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.RecoverPasswordRequest;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.ValidateMailRequestModel;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,10 +9,7 @@ import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Service for user authentications and validations")
@@ -42,30 +37,31 @@ public class AuthController {
     /**
      * Validate if the email exists in the system, returns true if it exists, otherwise throws an exception.
      *
-     * @param validateMailRequestModel The request containing the email to be validated.
+     * @param email The email to be validated.
      * @return otherwise an exception is thrown.
      */
     @Operation(
             summary = "Validate if email exists",
             description = "Validate if the email exists in the system, returns true if it exists, otherwise throws an exception."
     )
-    @PostMapping("/validate/mail")
-    public ResponseEntity<Void> validateMail(@Valid @RequestBody ValidateMailRequestModel validateMailRequestModel) {
-        authService.validateMail(validateMailRequestModel);
+    @GetMapping("/validate/mail")
+    public ResponseEntity<Void> validateMail(@RequestParam String email) {
+        authService.validateMail(email);
         return ResponseEntity.noContent().build();
     }
 
     /**
      * Recover the password for a user with the given email, returns true if the email exists, otherwise throws an exception.
-     * @param recoverPasswordRequest The request containing the email for which the password recovery process should be initiated.
+     * @param email The email of the user to recover the password for.
+     * @return otherwise an exception is thrown.
      */
     @Operation(
             summary = "Recover password",
             description = "Recover password for a user, returns true if the email exists and the recovery process is initiated, otherwise throws an exception."
     )
-    @PostMapping("/recover/password")
-    public ResponseEntity<Void> recoverPassword(@Valid @RequestBody RecoverPasswordRequest recoverPasswordRequest) throws MessagingException {
-        authService.recoverPassword(recoverPasswordRequest);
+    @GetMapping("/recover/password")
+    public ResponseEntity<Void> recoverPassword(@RequestParam String email) throws MessagingException {
+        authService.recoverPassword(email);
         return ResponseEntity.noContent().build();
     }
 }

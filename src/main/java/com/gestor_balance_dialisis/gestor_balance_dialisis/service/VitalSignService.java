@@ -88,4 +88,38 @@ public class VitalSignService {
                 Utility.startDay(actualDate),Utility.endDay(actualDate),patientId, StatusEnum.ACTIVO)
                 .stream().map(VitalSignDetailResponse::new).toList();
     }
+
+    /**
+     * Updates an existing vital sign record based on the provided request data and vital sign ID.
+     *
+     * @param vitalSignId      the ID of the vital sign to be updated
+     * @param vitalSignRequest the request containing the updated vital sign information
+     * @return a response containing the updated vital sign information
+     * @throws BalanceGlobalException if the vital sign record to be updated does not exist
+     */
+    @Transactional
+    public VitalSignResponse updateVitalSign(Long vitalSignId, VitalSignRequest vitalSignRequest) {
+        Optional<VitalSign> vitalSign = vitalSignRepository.findById(vitalSignId);
+        if(vitalSign.isPresent()){
+            vitalSignRequest.setId(vitalSignId);
+            return new VitalSignResponse(vitalSignRepository.save(new VitalSign(vitalSignRequest)));
+        }
+        throw new BalanceGlobalException("Vital sign detail doesn't exist", HttpStatus.CONFLICT.value());
+    }
+
+    /**
+     * Deletes an existing vital sign record based on the provided vital sign ID.
+     *
+     * @param vitalSignId the ID of the vital sign to be deleted
+     * @throws BalanceGlobalException if the vital sign record to be deleted does not exist
+     */
+    @Transactional
+    public void deleteVitalSign(Long vitalSignId) {
+        Optional<VitalSign> vitalSign = vitalSignRepository.findById(vitalSignId);
+        if(vitalSign.isPresent()){
+            vitalSignRepository.deleteById(vitalSignId);
+            return;
+        }
+        throw new BalanceGlobalException("Vital sign detail doesn't exist", HttpStatus.CONFLICT.value());
+    }
 }

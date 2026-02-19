@@ -52,7 +52,6 @@ public class UserDto implements Serializable {
     private StatusEnum status;
 
     @Schema(description = "User rol", example = "ADMIN")
-    @NotNull(message = "User rol is required")
     private UserRol rol;
 
     @Schema(description = "User creation date", example = "2023-10-01T12:00:00Z")

@@ -25,9 +25,10 @@ public class JwtUtil {
      * @param username The username for which the token is generated.
      * @return A JWT token containing the username as the subject, with an expiration time of 30 minutes.
      */
-    public String generateToken(String username) {
+    public String generateToken(String username,Long userId) {
         return Jwts.builder()
                 .setSubject(username)
+                .setId(String.valueOf(userId))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 80000)) // 80 seconds expiration time
                 .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()), SignatureAlgorithm.HS256)

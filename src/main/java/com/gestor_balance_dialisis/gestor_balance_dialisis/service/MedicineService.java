@@ -86,4 +86,38 @@ public class MedicineService {
         return medicineDetailRepository.getMedicineDetailByPatientIdAndStatusOrderByDateAsc(patientId, StatusEnum.ACTIVO)
                 .stream().map(MedicineDetailResponseDto::new).toList();
     }
+
+    /**
+     * Updates an existing medicine record based on the provided medicine ID and request data.
+     *
+     * @param medicineId      the ID of the medicine to be updated
+     * @param medicineRequest the request containing the updated medicine information
+     * @return a response containing the updated medicine information
+     * @throws BalanceGlobalException if the medicine to be updated does not exist
+     */
+    @Transactional
+    public MedicineResponse updateMedicine(Long medicineId, MedicineRequest medicineRequest) {
+        Optional<Medicine> medicine = medicineRepository.findById(medicineId);
+        if(medicine.isPresent()){
+            medicineRequest.setId(medicineId);
+            return new MedicineResponse(medicineRepository.save(new Medicine(medicineRequest)));
+        }
+        throw new BalanceGlobalException("Medicine doesn't exist", HttpStatus.CONFLICT.value());
+    }
+
+    /**
+     * Deletes an existing medicine record based on the provided medicine ID.
+     *
+     * @param medicineId the ID of the medicine to be deleted
+     * @throws BalanceGlobalException if the medicine to be deleted does not exist
+     */
+    @Transactional
+    public void deleteMedicine(Long medicineId) {
+        Optional<Medicine> medicine = medicineRepository.findById(medicineId);
+        if(medicine.isPresent()){
+            medicineRepository.deleteById(medicineId);
+            return;
+        }
+        throw new BalanceGlobalException("Medicine doesn't exist", HttpStatus.CONFLICT.value());
+    }
 }

@@ -29,7 +29,7 @@ public class PatientController {
      */
     @Operation(summary = "Save a new patient", description = "Endpoint to save a new patient with the provided information.")
     @PostMapping("/save")
-    public ResponseEntity<PatientResponse> saveUser(@Valid @RequestBody PatientRequest patientRequest) {
+    public ResponseEntity<PatientResponse> savePatient(@Valid @RequestBody PatientRequest patientRequest) {
         return ResponseEntity.created(URI.create("/api/patients/save" + patientRequest.getId())).body(patientService.save(patientRequest));
     }
 
@@ -43,5 +43,31 @@ public class PatientController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<List<PatientResponse>> getPatientsForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(patientService.findByUserId(userId));
+    }
+
+    /**
+     * Endpoint to update an existing patient.
+     *
+     * @param patientId      the ID of the patient to be updated
+     * @param patientRequest the patient request containing the updated patient's information
+     * @return ResponseEntity containing the updated patient response
+     */
+    @Operation(summary = "Update a patient", description = "Endpoint to update an existing patient with the provided information.")
+    @PatchMapping("/{patientId}")
+    public ResponseEntity<PatientResponse> savePatient(@Valid @RequestBody PatientRequest patientRequest, @PathVariable Long patientId) {
+        return ResponseEntity.ok(patientService.updatePatient(patientRequest, patientId));
+    }
+
+    /**
+     * Endpoint to delete an existing patient.
+     *
+     * @param patientId the ID of the patient to be deleted
+     * @return ResponseEntity with no content after successful deletion
+     */
+    @Operation(summary = "Delete a patient", description = "Endpoint to delete an existing patient with the provided patient ID.")
+    @DeleteMapping("/{patientId}")
+    public ResponseEntity<Void> deletePatient(@PathVariable Long patientId) {
+        patientService.deletePatient(patientId);
+        return ResponseEntity.noContent().build();
     }
 }

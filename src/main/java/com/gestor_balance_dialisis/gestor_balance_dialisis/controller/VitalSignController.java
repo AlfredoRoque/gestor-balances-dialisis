@@ -47,6 +47,32 @@ public class VitalSignController {
     }
 
     /**
+     * Endpoint to update an existing vital sign with the provided information.
+     *
+     * @param vitalSignId      The ID of the vital sign to be updated.
+     * @param vitalSignRequest The request body containing the updated details of the vital sign.
+     * @return A ResponseEntity containing the updated vital sign response and an HTTP status code.
+     */
+    @Operation(summary = "Update vital sign", description = "Endpoint to update a vital sign information.")
+    @PatchMapping("/{vitalSignId}")
+    public ResponseEntity<VitalSignResponse> updateVitalSign(@Valid @RequestBody VitalSignRequest vitalSignRequest, @PathVariable Long vitalSignId) {
+        return ResponseEntity.ok(vitalSignService.updateVitalSign(vitalSignId, vitalSignRequest));
+    }
+
+    /**
+     * Endpoint to delete an existing vital sign based on the provided ID.
+     *
+     * @param vitalSignId The ID of the vital sign to be deleted.
+     * @return A ResponseEntity with no content and an HTTP status code indicating the result of the deletion operation.
+     */
+    @Operation(summary = "Update vital sign", description = "Endpoint to update a vital sign information.")
+    @DeleteMapping("/{vitalSignId}")
+    public ResponseEntity<Void> deleteVitalSign(@PathVariable Long vitalSignId) {
+        vitalSignService.deleteVitalSign(vitalSignId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * Endpoint to save a new vital sign detail with the provided information.
      *
      * @param vitalSignDetailRequest The request body containing the details of the vital sign detail to be saved.

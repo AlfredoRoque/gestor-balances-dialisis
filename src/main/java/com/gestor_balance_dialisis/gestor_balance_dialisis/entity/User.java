@@ -65,6 +65,7 @@ public class User {
         this.setEmail(user.getEmail());
         this.setRol(user.getRol());
         this.setStatus(StatusEnum.ACTIVO);
+        this.setRol(UserRol.USER);
         this.setCreationDate(new Date());
         this.setPassword(encodedPassword);
     }

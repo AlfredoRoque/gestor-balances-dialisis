@@ -40,4 +40,27 @@ public class PatientService {
         return patientRepository.findByUserId(userId)
                 .stream().map(PatientResponse::new).toList();
     }
+
+    /**
+     * Update an existing patient record in the system, returns the updated patient response.
+     *
+     * @param patientRequest The patient request containing the updated patient's information.
+     * @param patientId      The ID of the patient to be updated.
+     * @return The updated patient response.
+     */
+    @Transactional
+    public PatientResponse updatePatient(PatientRequest patientRequest,Long patientId) {
+        patientRequest.setId(patientId);
+        return new PatientResponse(patientRepository.save(new Patient(patientRequest)));
+    }
+
+    /**
+     * Delete a patient record from the system based on the provided patient ID.
+     *
+     * @param patientId The ID of the patient to be deleted.
+     */
+    @Transactional
+    public void deletePatient(Long patientId) {
+        patientRepository.deleteById(patientId);
+    }
 }

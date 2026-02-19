@@ -41,17 +41,17 @@ public class AuthService {
                 user.getPassword())) {
             throw new BalanceGlobalException("Invalid credentials", HttpStatus.CONFLICT.value());
         }
-        return new JwtResponse(jwtUtil.generateToken(request.getUsername()));
+        return new JwtResponse(jwtUtil.generateToken(request.getUsername(),user.getId()));
     }
 
     /**
      * Validate if the email exists in the system, returns true if it exists, otherwise throws an exception.
      *
-     * @param validateMailRequestModel The request containing the email to be validated.
+     * @param email The email to be validated.
      * @throws BalanceGlobalException if the email does not exist.
      */
-    public void validateMail(ValidateMailRequestModel validateMailRequestModel) {
-        userService.findByEmail(validateMailRequestModel.getEmail());
+    public void validateMail(String email) {
+        userService.findByEmail(email);
     }
 
     /**
@@ -60,15 +60,15 @@ public class AuthService {
      * TODO: Validate migration to kafka for password recovery process, currently it is a simple implementation that sends an email to the user with a temporary password,
      *  but it can be improved by using a more robust and scalable solution like Kafka to handle the password recovery process asynchronously and reliably.
      *
-     * @param recoverPasswordRequest The request containing the email to recover the password for.
+     * @param email The email of the user to recover the password for.
      * @throws BalanceGlobalException if the email does not exist.
      */
     @Async
-    public void recoverPassword(RecoverPasswordRequest recoverPasswordRequest) throws MessagingException {
-        User user = userService.findByEmail(recoverPasswordRequest.getEmail());
+    public void recoverPassword(String email) throws MessagingException {
+        User user = userService.findByEmail(email);
         String temporaryPassword = Utility.generateTemporaryPassword(10);
         try {
-            userService.save(new UserDto(user,temporaryPassword));
+            userService.updatePassword(new UserDto(user,temporaryPassword));
         }catch (Exception e){
             throw new BalanceGlobalException("Error al actualizar la contraseña", HttpStatus.CONFLICT.value());
         }

@@ -58,4 +58,14 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new BalanceGlobalException("Usuario no encontrado",HttpStatus.NOT_FOUND.value()));
     }
+
+    /**
+     * Update the password of an existing user, returns the updated user with an encrypted password.
+     *
+     * @param user The user data to be updated, including username, email, and new password.
+     */
+    @Transactional
+    public void updatePassword(UserDto user) {
+        new UserDto(userRepository.save(new User(user, passwordEncoder.encode(user.getPassword()))));
+    }
 }

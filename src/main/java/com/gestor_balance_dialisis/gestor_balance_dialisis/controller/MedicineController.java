@@ -47,6 +47,32 @@ public class MedicineController {
     }
 
     /**
+     * Endpoint to update an existing medicine with the provided information.
+     *
+     * @param medicineId      the ID of the medicine to be updated
+     * @param medicineRequest the request containing the updated medicine information
+     * @return a response containing the updated medicine information
+     */
+    @Operation(summary = "Update a medicine", description = "Endpoint to update an existing medicine with the provided information.")
+    @PatchMapping("/{medicineId}")
+    public ResponseEntity<MedicineResponse> updateMedicine(@PathVariable Long medicineId, @Valid @RequestBody MedicineRequest medicineRequest) {
+        return ResponseEntity.ok(medicineService.updateMedicine(medicineId,medicineRequest));
+    }
+
+    /**
+     * Endpoint to delete an existing medicine with the provided medicine ID.
+     *
+     * @param medicineId the ID of the medicine to be deleted
+     * @return a response indicating that the medicine has been successfully deleted
+     */
+    @Operation(summary = "Delete a medicine", description = "Endpoint to delete an existing medicine with the provided medicine ID.")
+    @DeleteMapping("/{medicineId}")
+    public ResponseEntity<Void> deleteMedicine(@PathVariable Long medicineId) {
+        medicineService.deleteMedicine(medicineId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * Endpoint to save a new medicine detail with the provided information.
      *
      * @param medicineDetailRequestDto the request containing the medicine detail information to be saved
