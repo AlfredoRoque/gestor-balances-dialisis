@@ -14,6 +14,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -55,7 +56,7 @@ public class UserDto implements Serializable {
     private UserRol rol;
 
     @Schema(description = "User creation date", example = "2023-10-01T12:00:00Z")
-    private Date creationDate;
+    private Instant creationDate;
 
     /**
      * Constructor to create a new UserDto instance by copying the properties of a User object for response purposes, excluding the password for security reasons.

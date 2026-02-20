@@ -24,4 +24,8 @@ public class LoginRequest implements Serializable {
     @Schema(description = "User password", example = "password123")
     @NotBlank(message = "Password is required")
     private  String password;
+
+    @Schema(description = "User time zone", example = "America/New_York")
+    @NotBlank(message = "Time zone is required")
+    private  String timeZone;
 }

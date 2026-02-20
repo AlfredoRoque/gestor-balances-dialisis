@@ -3,8 +3,7 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.util;
 import lombok.experimental.UtilityClass;
 
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 
 /**
  * Utility class for common helper methods.
@@ -35,22 +34,33 @@ public class Utility {
     }
 
     /**
-     * Converts a LocalDateTime object to a Date object.
+     * Returns the start of the day (00:00:00) for the given Instant in UTC.
      *
-     * @param dateTime The LocalDateTime object to be converted.
-     * @return A Date object representing the same point in time as the provided LocalDateTime.
+     * @param instant The Instant for which to calculate the start of the day.
+     * @return An Instant representing the start of the day in UTC.
      */
-    public static LocalDateTime startDay(LocalDateTime dateTime) {
-        return dateTime.toLocalDate().atStartOfDay();
+    public static Instant startDay(Instant instant) {
+        ZoneId zone = SecurityUtils.getUserZone();
+        return instant
+                .atZone(zone)
+                .toLocalDate()
+                .atStartOfDay(zone)
+                .toInstant();
     }
 
     /**
-     * Converts a LocalDateTime object to a Date object representing the end of the day.
+     * Returns the end of the day (23:59:59.999999999) for the given Instant in UTC.
      *
-     * @param dateTime The LocalDateTime object to be converted.
-     * @return A Date object representing the end of the day for the provided LocalDateTime.
+     * @param instant The Instant for which to calculate the end of the day.
+     * @return An Instant representing the end of the day in UTC.
      */
-    public static LocalDateTime endDay(LocalDateTime dateTime) {
-        return dateTime.toLocalDate().atTime(LocalTime.MAX);
+    public static Instant endDay(Instant instant) {
+        ZoneId zone = SecurityUtils.getUserZone();
+        return instant
+                .atZone(zone)
+                .toLocalDate()
+                .atTime(LocalTime.MAX)
+                .atZone(zone)
+                .toInstant();
     }
 }

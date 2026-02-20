@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -36,7 +37,7 @@ public class MedicineDetail {
     private Patient patient;
 
     @Column(name = "fecha_inicio_toma", nullable = false)
-    private LocalDateTime date;
+    private Instant date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_medicina", nullable = false)
@@ -49,10 +50,10 @@ public class MedicineDetail {
     private String frequency;
 
     @Column(name = "fecha_modificacion")
-    private LocalDateTime modificationDate;
+    private Instant modificationDate;
 
     @Column(name = "fecha_borrado")
-    private LocalDateTime deletionDate;
+    private Instant deletionDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estatus", length = 20, nullable = false)
@@ -82,7 +83,7 @@ public class MedicineDetail {
      * @param medicineDetailUpdateRequestDto The MedicineDetailUpdateRequestDto containing the updated information for the MedicineDetail entity.
      * @param modificationOrDeletionDate The date of modification or deletion, depending on the status provided in the update request.
      */
-    public MedicineDetail(MedicineDetail medicineDetail, MedicineDetailUpdateRequestDto medicineDetailUpdateRequestDto, LocalDateTime modificationOrDeletionDate) {
+    public MedicineDetail(MedicineDetail medicineDetail, MedicineDetailUpdateRequestDto medicineDetailUpdateRequestDto, Instant modificationOrDeletionDate) {
         this.id = medicineDetail.getId();
         this.patient = medicineDetail.getPatient();
         this.date = medicineDetail.getDate();

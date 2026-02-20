@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -29,7 +30,7 @@ public class  FluidBalanceResponse implements Serializable {
     private Long id;
 
     @Schema(description = "Fluid balance date", example = "2023-10-01T12:00:00Z")
-    private LocalDateTime date;
+    private Instant date;
 
     @Schema(description = "Liquid drained", example = "500.00")
     private BigDecimal drained;

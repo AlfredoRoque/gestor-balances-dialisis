@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,6 +43,32 @@ public class FluidBalanceController {
     }
 
     /**
+     * Endpoint to update an existing fluid balance record.
+     *
+     * @param fluidBalanceId      the ID of the fluid balance record to be updated
+     * @param fluidBalanceRequest the fluid balance request containing the updated information
+     * @return ResponseEntity containing the updated fluid balance response
+     */
+    @Operation(summary = "Update a fluid balance", description = "Endpoint to update an existing fluid balance record with the provided information.")
+    @PatchMapping("/{fluidBalanceId}")
+    public ResponseEntity<FluidBalanceResponse> updateFluidBalance(@PathVariable Long fluidBalanceId, @Valid @RequestBody FluidBalanceRequest fluidBalanceRequest) {
+        return ResponseEntity.ok(fluidBalanceService.updateFluidBalance(fluidBalanceId,fluidBalanceRequest));
+    }
+
+    /**
+     * Endpoint to delete an existing fluid balance record based on the provided fluid balance ID.
+     *
+     * @param fluidBalanceId the ID of the fluid balance record to be deleted
+     * @return ResponseEntity with no content, indicating that the deletion was successful
+     */
+    @Operation(summary = "Delete a fluid balance", description = "Endpoint to delete an existing fluid balance record based on the provided fluid balance ID.")
+    @DeleteMapping("/{fluidBalanceId}")
+    public ResponseEntity<Void> deleteFluidBalance(@PathVariable Long fluidBalanceId) {
+        fluidBalanceService.deleteFluidBalance(fluidBalanceId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * Endpoint to retrieve fluid balance records based on the provided date range and patient ID.
      * The end date is optional; if not provided, it will default to the end of the day of the start date.
      *
@@ -53,8 +80,8 @@ public class FluidBalanceController {
     @Operation(summary = "Get fluid balances by dates and patient", description = "Endpoint to retrieve fluid balance records based on the provided date range and patient ID. The end date is optional; " +
             "if not provided, it will default to the end of the day of the start date.")
     @GetMapping("/dates")
-    public ResponseEntity<List<FluidBalanceResponse>> getFluidBalanceByDateAndPatient(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @RequestParam(required = false) LocalDateTime endDate,
+    public ResponseEntity<List<FluidBalanceResponse>> getFluidBalanceByDateAndPatient(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant startDate,
+                                                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @RequestParam(required = false) Instant endDate,
                                                                             @RequestParam Long patientId) {
         return ResponseEntity.ok(fluidBalanceService.getFluidBalanceByDateAndPatient(startDate,endDate,patientId));
     }
@@ -68,8 +95,8 @@ public class FluidBalanceController {
      */
     @Operation(summary = "Calculate fluid balance for patient", description = "Endpoint to calculate the fluid balance for a patient based on the provided date range and patient ID.")
     @GetMapping("/calculate/patients/{patientId}")
-    public ResponseEntity<List<CalculateFluidBalanceResponseDto>> calculateBalanceFluidForPatient(@PathVariable Long patientId) {
-        return ResponseEntity.ok(fluidBalanceService.calculateBalanceFluidForPatient(patientId, null, null));
+    public ResponseEntity<List<CalculateFluidBalanceResponseDto>> calculateBalanceFluidForPatient(@PathVariable Long patientId, @RequestParam Instant startDate) {
+        return ResponseEntity.ok(fluidBalanceService.calculateBalanceFluidForPatient(patientId, startDate, null));
     }
 
     /**
@@ -82,8 +109,8 @@ public class FluidBalanceController {
      */
     @Operation(summary = "Calculate fluid balance for patient", description = "Endpoint to calculate the fluid balance for a patient based on the provided date range and patient ID.")
     @GetMapping("/calculate/patients/{patientId}/dates")
-    public ResponseEntity<List<CalculateFluidBalanceResponseDto>> calculateBalanceFluidForPatientAndDates(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+    public ResponseEntity<List<CalculateFluidBalanceResponseDto>> calculateBalanceFluidForPatientAndDates(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant startDate,
+                                                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant endDate,
                                                                                             @PathVariable Long patientId) {
         return ResponseEntity.ok(fluidBalanceService.calculateBalanceFluidForPatient(patientId, startDate, endDate));
     }
@@ -99,8 +126,8 @@ public class FluidBalanceController {
      */
     @Operation(summary = "Generate pdf whit calculate fluid balance for patient", description = "Endpoint to generate a PDF report with the calculated fluid balance for a patient based on the provided date range and patient ID.")
     @GetMapping("/reports/balances/patients/{patientId}/dates")
-    public ResponseEntity<byte[]> getReportBalanceFluidForPatient(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+    public ResponseEntity<byte[]> getReportBalanceFluidForPatient(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant startDate,
+                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant endDate,
                                                                    @PathVariable Long patientId) throws Exception {
         List<Object> response = fluidBalanceService.getReportBalanceFluidForPatient(patientId, startDate, endDate);
         return ResponseEntity.ok()
@@ -121,8 +148,8 @@ public class FluidBalanceController {
      */
     @Operation(summary = "Generate pdf whit calculate fluid balance for patient and sed to email", description = "Endpoint to generate a PDF report with the calculated fluid balance for a patient based on the provided date range and patient ID, and send it to the patient's email.")
     @GetMapping("/reports/balances/patients/{patientId}/dates/email")
-    public ResponseEntity<Void> sendReportBalanceFluidForPatientToEmail(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+    public ResponseEntity<Void> sendReportBalanceFluidForPatientToEmail(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant startDate,
+                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant endDate,
                                                                   @PathVariable Long patientId) throws Exception {
         fluidBalanceService.sendReportBalanceFluidForPatientToEmail(patientId, startDate, endDate);
         return ResponseEntity.noContent().build();

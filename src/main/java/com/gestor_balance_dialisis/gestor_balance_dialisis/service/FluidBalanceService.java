@@ -6,6 +6,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.*;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,6 +52,34 @@ public class FluidBalanceService {
     }
 
     /**
+     * Retrieves all fluid balance records from the database.
+     *
+     * @return List of FluidBalanceResponse containing the information of all fluid balance records
+     */
+    public FluidBalanceResponse updateFluidBalance(Long fluidBalanceId, FluidBalanceRequest fluidBalanceRequest) {
+        Optional<FluidBalance> fluidBalanceOptional = fluidBalanceRepository.findById(fluidBalanceId);
+        if (fluidBalanceOptional.isEmpty()) {
+            throw new BalanceGlobalException("No existe el balance de fluido: ", HttpStatus.CONFLICT.value());
+        }
+        FluidBalance updateFluidBalance = new FluidBalance(fluidBalanceRequest);
+        updateFluidBalance.setId(fluidBalanceId);
+        return new FluidBalanceResponse(fluidBalanceRepository.save(updateFluidBalance));
+    }
+
+    /**
+     * Deletes a fluid balance record from the database based on the provided record ID.
+     *
+     * @param fluidBalanceId the ID of the fluid balance record to be deleted
+     */
+    public void deleteFluidBalance(Long fluidBalanceId) {
+        Optional<FluidBalance> fluidBalanceOptional = fluidBalanceRepository.findById(fluidBalanceId);
+        if (fluidBalanceOptional.isEmpty()) {
+            throw new BalanceGlobalException("No existe el balance de fluido: ", HttpStatus.CONFLICT.value());
+        }
+        fluidBalanceRepository.deleteById(fluidBalanceId);
+    }
+
+    /**
      * Retrieves fluid balance records based on the provided date range.
      *
      * @param startLocalDate the start date for filtering fluid balance records
@@ -58,10 +87,10 @@ public class FluidBalanceService {
      * @param patientId      the ID of the patient whose fluid balance records are to be retrieved
      * @return List of FluidBalanceResponse containing the filtered fluid balance records
      */
-    public List<FluidBalanceResponse> getFluidBalanceByDateAndPatient(LocalDateTime startLocalDate, LocalDateTime endLocalDate,
+    public List<FluidBalanceResponse> getFluidBalanceByDateAndPatient(Instant startLocalDate, Instant endLocalDate,
                                                             Long patientId) {
-        LocalDateTime startDate = Utility.startDay(startLocalDate);
-        LocalDateTime endDate = Objects.nonNull(endLocalDate)?endLocalDate:Utility.endDay(startDate);
+        Instant startDate = Utility.startDay(startLocalDate);
+        Instant endDate = Objects.nonNull(endLocalDate)?Utility.endDay(endLocalDate):Utility.endDay(startDate);
 
         return fluidBalanceRepository.getFluidBalancesByDateBetweenAndPatientIdOrderByDateAsc(startDate, endDate,patientId).stream().map(FluidBalanceResponse::new).toList();
     }
@@ -75,20 +104,31 @@ public class FluidBalanceService {
      * @param endDate   the end date for filtering records (optional)
      * @return List of CalculateFluidBalanceResponseDto containing the calculated fluid balance information
      */
-    public List<CalculateFluidBalanceResponseDto> calculateBalanceFluidForPatient(Long patientId, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<CalculateFluidBalanceResponseDto> calculateBalanceFluidForPatient(Long patientId, Instant startDate, Instant endDate) {
         List<CalculateFluidBalanceResponseDto> responseDtoList = new ArrayList<>();
-        if (Objects.isNull(startDate)&&Objects.isNull(endDate)) {
-            LocalDateTime actualDate = LocalDateTime.now();
-            LocalDateTime actualStartDate = Utility.startDay(actualDate);
-            LocalDateTime actualEndDate = Utility.endDay(actualStartDate);
+        if (Objects.isNull(endDate)) {
+            Instant actualStartDate = Utility.startDay(startDate);
+            Instant actualEndDate = Utility.endDay(actualStartDate);
             // Process to calculate fluid balance by actual day
-            responseDtoList.add(this.getBalancesInformation(actualDate, patientId, actualStartDate, actualEndDate));
+            responseDtoList.add(this.getBalancesInformation(startDate, patientId, actualStartDate, actualEndDate));
         }else {
             // Process to calculate fluid balance by startDate and endDate range
-            for (LocalDateTime dt = startDate; !dt.isAfter(endDate); dt = dt.plusDays(1)) {
-                LocalDateTime actualStartDate = Utility.startDay(dt);
-                LocalDateTime actualEndDate = Utility.endDay(actualStartDate);
-                CalculateFluidBalanceResponseDto balanceInformation = this.getBalancesInformation(dt, patientId, actualStartDate, actualEndDate);
+
+            ZoneId zone = SecurityUtils.getUserZone();
+
+            LocalDate start = startDate.atZone(zone).toLocalDate();
+            LocalDate end = endDate.atZone(zone).toLocalDate();
+
+            for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+
+                Instant actualStartDate = date.atStartOfDay(zone).toInstant();
+                Instant actualEndDate = date.atTime(LocalTime.MAX)
+                        .atZone(zone)
+                        .toInstant();
+
+                CalculateFluidBalanceResponseDto balanceInformation =
+                        this.getBalancesInformation(date.atStartOfDay(zone).toInstant(), patientId, actualStartDate, actualEndDate);
+
                 if (Objects.nonNull(balanceInformation)) {
                     responseDtoList.add(balanceInformation);
                 }
@@ -106,7 +146,7 @@ public class FluidBalanceService {
      * @param actualEndDate   the end date for filtering records (used for database queries)
      * @return CalculateFluidBalanceResponseDto containing the calculated fluid balance information for the specified date and patient
      */
-    private CalculateFluidBalanceResponseDto getBalancesInformation(LocalDateTime actualDate, Long  patientId, LocalDateTime actualStartDate, LocalDateTime actualEndDate) {
+    private CalculateFluidBalanceResponseDto getBalancesInformation(Instant actualDate, Long  patientId, Instant actualStartDate, Instant actualEndDate) {
         CalculateFluidBalanceResponseDto response = new CalculateFluidBalanceResponseDto();
         response.setFluidBalances(this.getFluidBalanceByDateAndPatient(Objects.nonNull(actualDate)?actualDate:actualStartDate,
                 Objects.nonNull(actualEndDate)?actualEndDate:null,patientId));
@@ -158,7 +198,7 @@ public class FluidBalanceService {
      * @return List containing the generated PDF file as a byte array, its size, and a filename
      * @throws BalanceGlobalException if there is an error during report generation or if the patient is not found
      */
-    public List<Object> getReportBalanceFluidForPatient(Long patientId, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
+    public List<Object> getReportBalanceFluidForPatient(Long patientId, Instant startDate, Instant endDate) throws Exception {
         List<Object> response = new ArrayList<>();
         Optional<Patient> patient = patientRepository.findById(patientId);
         if(patient.isEmpty()){
@@ -184,7 +224,8 @@ public class FluidBalanceService {
         byte[] file = this.mergePdfs(pdfs);
         response.add(file);
         response.add(file.length);
-        response.add(patient.get().getName()+"-"+startDate.format(formatterDay)+"-a-"+endDate.format(formatterDay)+".pdf");
+        ZoneId zone = SecurityUtils.getUserZone();
+        response.add(patient.get().getName()+"-"+startDate.atZone(zone).format(formatterDay)+"-a-"+endDate.atZone(zone).format(formatterDay)+".pdf");
         return response;
     }
 
@@ -219,7 +260,7 @@ public class FluidBalanceService {
      * @param endDate   the end date for filtering records to be included in the report
      * @throws Exception if there is an error during report generation or email sending
      */
-    public void sendReportBalanceFluidForPatientToEmail(Long patientId, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
+    public void sendReportBalanceFluidForPatientToEmail(Long patientId, Instant startDate, Instant endDate) throws Exception {
         List<Object> response = this.getReportBalanceFluidForPatient(patientId, startDate, endDate);
         if (!response.isEmpty()) {
             mailService.sendBalancesMailToUserMail(response,patientId,startDate ,endDate);

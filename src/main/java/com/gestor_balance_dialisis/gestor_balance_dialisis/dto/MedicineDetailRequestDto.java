@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -36,7 +37,7 @@ public class MedicineDetailRequestDto implements Serializable {
 
     @Schema(description = "Registration date", example = "2023-10-01T12:00:00Z")
     @NotNull(message = "Registration date is required")
-    private LocalDateTime date;
+    private Instant date;
 
     @Schema(description = "Medicine id", example = "1")
     @NotNull(message = "Medicine is required")
@@ -53,10 +54,10 @@ public class MedicineDetailRequestDto implements Serializable {
     private String frequency;
 
     @Schema(description = "Modification date", example = "2023-10-01T12:00:00Z")
-    private LocalDateTime modificationDate;
+    private Instant modificationDate;
 
     @Schema(description = "Deletion date", example = "2023-10-01T12:00:00Z")
-    private LocalDateTime deletionDate;
+    private Instant deletionDate;
 
     @Schema(description = "Medicine detail status", example = "ACTIVO")
     private StatusEnum status;

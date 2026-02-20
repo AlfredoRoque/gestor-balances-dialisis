@@ -9,9 +9,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Service for managing extra fluids, including saving new extra fluid records and retrieving existing ones.
@@ -40,10 +42,25 @@ public class ExtraFluidService {
      * @param patientId the ID of the patient for whom to retrieve extra fluid records
      * @return a list of responses containing the extra fluid information for the specified patient and date
      */
-    public List<ExtraFluidResponseDto> getExtraFluidByActualDateAndPatient(Long patientId) {
-        LocalDateTime actualDate = LocalDateTime.now();
+    public List<ExtraFluidResponseDto> getExtraFluidByActualDateAndPatient(Long patientId,Instant actualDate) {
         return extraFluidRepository.getExtraFluidByDateIsBetweenAndPatientId(
                         Utility.startDay(actualDate),Utility.endDay(actualDate),patientId)
+                .stream().map(ExtraFluidResponseDto::new).toList();
+    }
+
+    /**
+     * Retrieves extra fluid records for a specific date range and a specific patient.
+     *
+     * @param patientId      the ID of the patient for whom to retrieve extra fluid records
+     * @param startLocalDate the start date of the date range for which to retrieve extra fluid records
+     * @param endLocalDate   the end date of the date range for which to retrieve extra fluid records
+     * @return a list of responses containing the extra fluid information for the specified patient and date range
+     */
+    public List<ExtraFluidResponseDto> getExtraFluidByDateAndPatient(Long patientId,Instant startLocalDate, Instant endLocalDate) {
+        Instant startDate = Utility.startDay(startLocalDate);
+        Instant endDate = Objects.nonNull(endLocalDate)?Utility.endDay(endLocalDate):Utility.endDay(startDate);
+        return extraFluidRepository.getExtraFluidByDateIsBetweenAndPatientId(
+                        Utility.startDay(startDate),Utility.endDay(endDate),patientId)
                 .stream().map(ExtraFluidResponseDto::new).toList();
     }
 }

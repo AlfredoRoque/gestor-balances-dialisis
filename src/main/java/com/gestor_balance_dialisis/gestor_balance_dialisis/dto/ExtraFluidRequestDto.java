@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -42,5 +43,5 @@ public class ExtraFluidRequestDto implements Serializable {
 
     @Schema(description = "Date of the extra fluid record", example = "2024-06-01T12:00:00Z")
     @NotNull(message = "Date is required")
-    private LocalDateTime date;
+    private Instant date;
 }

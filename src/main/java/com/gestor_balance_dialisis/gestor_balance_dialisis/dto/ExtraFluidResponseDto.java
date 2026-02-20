@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -38,7 +39,7 @@ public class ExtraFluidResponseDto implements Serializable {
     private BigDecimal ingested;
 
     @Schema(description = "Date of the extra fluid record", example = "2024-06-01T12:00:00Z")
-    private LocalDateTime date;
+    private Instant date;
 
     /**
      * Constructor to create an ExtraFluidResponseDto from an ExtraFluid entity.

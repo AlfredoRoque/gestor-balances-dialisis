@@ -4,6 +4,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.PatientRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +76,7 @@ public class MailService {
      * @throws MessagingException if there is an error while sending the email.
      * @throws IOException        if there is an error while creating or writing to the temporary file for the PDF attachment.
      */
-    public void sendBalancesMailToUserMail(List<Object> response,Long patientId, LocalDateTime startDate, LocalDateTime endDate) throws MessagingException, IOException {
+    public void sendBalancesMailToUserMail(List<Object> response, Long patientId, Instant startDate, Instant endDate) throws MessagingException, IOException {
         Optional<Patient> patient = patientRepository.findById(patientId);
         if(patient.isPresent()) {
             Context context = new Context();
@@ -86,7 +90,9 @@ public class MailService {
 
             DateTimeFormatter formatterDay = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             helper.setTo(patient.get().getUser().getEmail());
-            helper.setSubject("Balance de "+patient.get().getName() + " de " + startDate.format(formatterDay) + " a " + endDate.format(formatterDay) + " 🚀");
+            ZoneId zone = SecurityUtils.getUserZone();
+            helper.setSubject("Balance de "+patient.get().getName() + " de " + startDate.atZone(zone)
+                    .format(formatterDay) + " a " + endDate.atZone(zone).format(formatterDay) + " 🚀");
             helper.setText(htmlContent, true);
             File tempFile = File.createTempFile("reporte_", ".pdf");
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {

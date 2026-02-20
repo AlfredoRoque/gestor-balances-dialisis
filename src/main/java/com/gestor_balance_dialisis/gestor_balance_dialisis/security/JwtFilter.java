@@ -52,16 +52,18 @@ public class JwtFilter extends OncePerRequestFilter {
             if (header != null && header.startsWith("Bearer ")) {
                 String token = header.substring(7);
 
-                // Validar y extraer el username del token
+                // validate the token and extract username and zone
                 String username = jwtUtil.extractUsername(token);
+                String zone = jwtUtil.extractClaim(token, claims -> claims.get("zone", String.class));
 
                 if (username != null && !username.isEmpty()) {
-                    // Crear authorities (sin roles específicos por ahora)
+                    // create a simple authentication token with the username and a default role
                     Collection<GrantedAuthority> authorities = new ArrayList<>();
                     authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(username, null, authorities);
+                    auth.setDetails(zone); // save the zone in the authentication details for later use
 
                     SecurityContextHolder.getContext().setAuthentication(auth);
                     log.debug("JWT Token validado para usuario: {}", username);

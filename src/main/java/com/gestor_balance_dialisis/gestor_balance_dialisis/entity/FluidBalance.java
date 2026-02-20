@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
@@ -36,7 +37,7 @@ public class FluidBalance {
     private Patient patient;
 
     @Column(name = "fecha", nullable = false)
-    private LocalDateTime date;
+    private Instant date;
 
     @Column(name = "infundido", nullable = false)
     private BigDecimal infused;
@@ -46,9 +47,6 @@ public class FluidBalance {
 
     @Column(name = "descripcion_liquido", nullable = false)
     private String liquidDescription;
-
-    @Column(name = "fecha_prueba")
-    private OffsetDateTime datePrueba;
 
     /**
      * Constructor that initializes the FluidBalance entity based on a FluidBalanceRequest DTO.

@@ -5,6 +5,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -15,5 +16,5 @@ import java.util.List;
 @Repository
 public interface VitalSignDetailRepository extends JpaRepository<VitalSignDetail, Long> {
 
-    List<VitalSignDetail> getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatusOrderByDateAsc(LocalDateTime dateAfter, LocalDateTime dateBefore, Long patientId, StatusEnum status);
+    List<VitalSignDetail> getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatusOrderByDateAsc(Instant dateAfter, Instant dateBefore, Long patientId, StatusEnum status);
 }

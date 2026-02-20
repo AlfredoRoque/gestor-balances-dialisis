@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -104,7 +105,7 @@ public class VitalSignController {
      */
     @Operation(summary = "Get vital sign detail for actual date and patient", description = "Endpoint to retrieve vital sign details for a specific patient based on the actual date.")
     @GetMapping("/details/patients/actual-date/{patientId}")
-    public ResponseEntity<List<VitalSignDetailResponse>> getVitalSignDetailByActualDateAndPatient(@PathVariable Long patientId) {
-        return ResponseEntity.ok(vitalSignService.getVitalSignDetailByActualDateAndPatient(patientId));
+    public ResponseEntity<List<VitalSignDetailResponse>> getVitalSignDetailByActualDateAndPatient(@PathVariable Long patientId, @RequestParam Instant actualDate) {
+        return ResponseEntity.ok(vitalSignService.getVitalSignDetailByActualDateAndPatient(patientId, actualDate));
     }
 }

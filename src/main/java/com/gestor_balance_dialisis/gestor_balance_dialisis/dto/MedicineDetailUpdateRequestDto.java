@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 
 /**
  * Data Transfer Object for updating medicine details, containing fields for dose and frequency.
@@ -41,4 +42,7 @@ public class MedicineDetailUpdateRequestDto implements Serializable {
     @Schema(description = "Medicine detail status", example = "ACTIVO")
     @NotNull(message = "Status is required")
     private StatusEnum status;
+
+    @Schema(description = "Update date", example = "2024-06-01T12:00:00Z")
+    private Instant updateDate;
 }

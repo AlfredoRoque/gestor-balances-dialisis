@@ -41,7 +41,7 @@ public class AuthService {
                 user.getPassword())) {
             throw new BalanceGlobalException("Invalid credentials", HttpStatus.CONFLICT.value());
         }
-        return new JwtResponse(jwtUtil.generateToken(request.getUsername(),user.getId()));
+        return new JwtResponse(jwtUtil.generateToken(request.getUsername(),user.getId(),request.getTimeZone()));
     }
 
     /**

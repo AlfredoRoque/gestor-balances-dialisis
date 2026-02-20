@@ -29,9 +29,4 @@ public class CorsConfig {
 
         return source;
     }
-
-    @PostConstruct
-    public void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-    }
 }

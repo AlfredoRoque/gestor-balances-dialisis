@@ -5,6 +5,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface MedicineDetailRepository extends JpaRepository<MedicineDetail, 
 
     List<MedicineDetail> getMedicineDetailByPatientIdAndStatusOrderByDateAsc(Long patientId, StatusEnum status);
 
-    List<MedicineDetail> getMedicineDetailByPatientIdAndDateIsBetweenAndStatusOrderByDateAsc(Long patientId, Date dateBefore, Date dateAfter, StatusEnum status);
+    List<MedicineDetail> getMedicineDetailByPatientIdAndDateIsBetweenAndStatusOrderByDateAsc(Long patientId, Instant dateBefore, Instant dateAfter, StatusEnum status);
 }

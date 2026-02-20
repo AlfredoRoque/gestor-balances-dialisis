@@ -7,10 +7,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -45,7 +48,24 @@ public class ExtraFluidController {
      */
     @Operation(summary = "Get extra fluids for actual date and patient", description = "Endpoint to retrieve extra fluid records for the actual date and a specific patient.")
     @GetMapping("/patients/actual-date/{patientId}")
-    public ResponseEntity<List<ExtraFluidResponseDto>> getExtraFluidByActualDateAndPatient(@PathVariable Long patientId) {
-        return ResponseEntity.ok(extraFluidService.getExtraFluidByActualDateAndPatient(patientId));
+    public ResponseEntity<List<ExtraFluidResponseDto>> getExtraFluidByActualDateAndPatient(@RequestParam Instant actualDate,
+                                                                                           @PathVariable Long patientId) {
+        return ResponseEntity.ok(extraFluidService.getExtraFluidByActualDateAndPatient(patientId,actualDate));
+    }
+
+    /**
+     * Endpoint to retrieve extra fluid records for a specific date range and a specific patient.
+     *
+     * @param patientId The ID of the patient for whom to retrieve extra fluid records.
+     * @param startDate The start date of the date range for which to retrieve extra fluid records.
+     * @param endDate   The end date of the date range for which to retrieve extra fluid records (optional).
+     * @return A ResponseEntity containing a list of extra fluid responses and an HTTP status code.
+     */
+    @Operation(summary = "Get extra fluids for actual date and patient", description = "Endpoint to retrieve extra fluid records for the actual date and a specific patient.")
+    @GetMapping("/patients/{patientId}/dates")
+    public ResponseEntity<List<ExtraFluidResponseDto>> getExtraFluidByDateAndPatient(@PathVariable Long patientId,
+                                                                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant startDate,
+                                                                                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @RequestParam Instant endDate) {
+        return ResponseEntity.ok(extraFluidService.getExtraFluidByDateAndPatient(patientId,startDate,endDate));
     }
 }

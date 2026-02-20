@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -33,7 +34,7 @@ public class VitalSignDetailResponse implements Serializable {
     private Long patient;
 
     @Schema(description = "Vital sign detail id date", example = "2024-06-01T12:00:00")
-    private LocalDateTime date;
+    private Instant date;
 
     @Schema(description = "Vital sign id", example = "1")
     private VitalSignResponse vitalSign;

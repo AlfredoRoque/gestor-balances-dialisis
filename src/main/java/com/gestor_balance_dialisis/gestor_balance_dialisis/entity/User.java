@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +49,7 @@ public class User {
     private UserRol rol;
 
     @Column(name = "fecha_creacion", nullable = false)
-    private Date creationDate;
+    private Instant creationDate;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -66,7 +67,7 @@ public class User {
         this.setRol(user.getRol());
         this.setStatus(StatusEnum.ACTIVO);
         this.setRol(UserRol.USER);
-        this.setCreationDate(new Date());
+        this.setCreationDate(Instant.now());
         this.setPassword(encodedPassword);
     }
 
