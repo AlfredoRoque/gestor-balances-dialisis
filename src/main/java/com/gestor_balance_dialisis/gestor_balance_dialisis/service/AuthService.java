@@ -34,7 +34,7 @@ public class AuthService {
      * @throws BalanceGlobalException if the credentials are invalid.
      */
     public JwtResponse login(LoginRequest request) {
-
+        log.info("for user: {}",request.getUsername());
         User user = userService.findByUsername(request.getUsername());
         if (!passwordEncoder.matches(
                 request.getPassword(),
@@ -51,6 +51,7 @@ public class AuthService {
      * @throws BalanceGlobalException if the email does not exist.
      */
     public void validateMail(String email) {
+        log.info("for : {}",email);
         userService.findByEmail(email);
     }
 
@@ -65,6 +66,7 @@ public class AuthService {
      */
     @Async
     public void recoverPassword(String email) throws MessagingException {
+        log.info("for {}: ",email);
         User user = userService.findByEmail(email);
         String temporaryPassword = Utility.generateTemporaryPassword(10);
         try {

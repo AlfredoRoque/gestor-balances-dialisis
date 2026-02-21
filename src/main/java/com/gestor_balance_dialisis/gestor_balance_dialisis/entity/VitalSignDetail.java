@@ -2,7 +2,6 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.VitalSignDetailRequest;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.VitalSignDetailUpdateRequest;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,10 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Entity class representing the details of a vital sign measurement for a patient.
@@ -59,9 +55,9 @@ public class VitalSignDetail {
      */
     public VitalSignDetail(VitalSignDetailRequest vitalSignDetailRequest) {
         this.id = vitalSignDetailRequest.getId();
-        this.patient = new Patient(vitalSignDetailRequest.getPatient());
+        this.patient = new Patient(vitalSignDetailRequest.getPatientId());
         this.date = vitalSignDetailRequest.getDate();
-        this.vitalSign = new VitalSign(vitalSignDetailRequest.getVitalSign());
+        this.vitalSign = new VitalSign(vitalSignDetailRequest.getVitalSign().getId());
         this.value = vitalSignDetailRequest.getValue();
         this.status = Objects.nonNull(vitalSignDetailRequest.getStatus()) ? vitalSignDetailRequest.getStatus() : StatusEnum.ACTIVO;
     }
@@ -72,7 +68,7 @@ public class VitalSignDetail {
      * @param vitalSignDetail The existing VitalSignDetail entity to be updated.
      * @param vitalSignDetailUpdateRequest The request containing the new information for the update.
      */
-    public VitalSignDetail(VitalSignDetail vitalSignDetail, VitalSignDetailUpdateRequest vitalSignDetailUpdateRequest) {
+    public VitalSignDetail(VitalSignDetail vitalSignDetail, VitalSignDetailRequest vitalSignDetailUpdateRequest) {
         this.id = vitalSignDetail.getId();
         this.patient = vitalSignDetail.getPatient();
         this.date = vitalSignDetailUpdateRequest.getDate();

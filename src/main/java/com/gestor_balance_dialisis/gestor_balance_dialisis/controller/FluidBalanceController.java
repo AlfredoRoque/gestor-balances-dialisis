@@ -110,7 +110,7 @@ public class FluidBalanceController {
     @Operation(summary = "Calculate fluid balance for patient", description = "Endpoint to calculate the fluid balance for a patient based on the provided date range and patient ID.")
     @GetMapping("/calculate/patients/{patientId}/dates")
     public ResponseEntity<List<CalculateFluidBalanceResponseDto>> calculateBalanceFluidForPatientAndDates(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant startDate,
-                                                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant endDate,
+                                                                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant endDate,
                                                                                             @PathVariable Long patientId) {
         return ResponseEntity.ok(fluidBalanceService.calculateBalanceFluidForPatient(patientId, startDate, endDate));
     }
@@ -132,7 +132,7 @@ public class FluidBalanceController {
         List<Object> response = fluidBalanceService.getReportBalanceFluidForPatient(patientId, startDate, endDate);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+response.get(2))
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentType(MediaType.APPLICATION_PDF)
                 .contentLength((Integer) response.get(1))
                 .body((byte[]) response.get(0));
     }

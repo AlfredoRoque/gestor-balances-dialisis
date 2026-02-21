@@ -48,6 +48,7 @@ public class FluidBalanceService {
      * @return FluidBalanceResponse containing the saved fluid balance record
      */
     public FluidBalanceResponse save(FluidBalanceRequest fluidBalanceRequest) {
+        log.info("patientId : {}",fluidBalanceRequest.getPatientId());
         return new FluidBalanceResponse(fluidBalanceRepository.save(new FluidBalance(fluidBalanceRequest)));
     }
 
@@ -57,6 +58,7 @@ public class FluidBalanceService {
      * @return List of FluidBalanceResponse containing the information of all fluid balance records
      */
     public FluidBalanceResponse updateFluidBalance(Long fluidBalanceId, FluidBalanceRequest fluidBalanceRequest) {
+        log.info("fluidBalanceId : {}",fluidBalanceId);
         Optional<FluidBalance> fluidBalanceOptional = fluidBalanceRepository.findById(fluidBalanceId);
         if (fluidBalanceOptional.isEmpty()) {
             throw new BalanceGlobalException("No existe el balance de fluido: ", HttpStatus.CONFLICT.value());
@@ -72,6 +74,7 @@ public class FluidBalanceService {
      * @param fluidBalanceId the ID of the fluid balance record to be deleted
      */
     public void deleteFluidBalance(Long fluidBalanceId) {
+        log.info("fluidBalanceId: {}",fluidBalanceId);
         Optional<FluidBalance> fluidBalanceOptional = fluidBalanceRepository.findById(fluidBalanceId);
         if (fluidBalanceOptional.isEmpty()) {
             throw new BalanceGlobalException("No existe el balance de fluido: ", HttpStatus.CONFLICT.value());
@@ -105,15 +108,17 @@ public class FluidBalanceService {
      * @return List of CalculateFluidBalanceResponseDto containing the calculated fluid balance information
      */
     public List<CalculateFluidBalanceResponseDto> calculateBalanceFluidForPatient(Long patientId, Instant startDate, Instant endDate) {
+        log.info(" patientId :{}",patientId);
         List<CalculateFluidBalanceResponseDto> responseDtoList = new ArrayList<>();
         if (Objects.isNull(endDate)) {
+            log.info("actualDate : {}",startDate);
             Instant actualStartDate = Utility.startDay(startDate);
             Instant actualEndDate = Utility.endDay(actualStartDate);
             // Process to calculate fluid balance by actual day
             responseDtoList.add(this.getBalancesInformation(startDate, patientId, actualStartDate, actualEndDate));
         }else {
             // Process to calculate fluid balance by startDate and endDate range
-
+            log.info("range : {} {}",startDate,endDate);
             ZoneId zone = SecurityUtils.getUserZone();
 
             LocalDate start = startDate.atZone(zone).toLocalDate();
@@ -199,6 +204,7 @@ public class FluidBalanceService {
      * @throws BalanceGlobalException if there is an error during report generation or if the patient is not found
      */
     public List<Object> getReportBalanceFluidForPatient(Long patientId, Instant startDate, Instant endDate) throws Exception {
+        log.info("patient ID : {}",patientId);
         List<Object> response = new ArrayList<>();
         Optional<Patient> patient = patientRepository.findById(patientId);
         if(patient.isEmpty()){
@@ -225,6 +231,7 @@ public class FluidBalanceService {
         response.add(file);
         response.add(file.length);
         ZoneId zone = SecurityUtils.getUserZone();
+        endDate = Objects.nonNull(endDate)?endDate:Utility.endDay(startDate);
         response.add(patient.get().getName()+"-"+startDate.atZone(zone).format(formatterDay)+"-a-"+endDate.atZone(zone).format(formatterDay)+".pdf");
         return response;
     }
@@ -237,6 +244,7 @@ public class FluidBalanceService {
      * @throws Exception if an error occurs during the merging process
      */
     public byte[] mergePdfs(List<PdfFileDto> pdfs) throws Exception {
+        log.info("PDF size : {}",pdfs.size());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfDocument finalDoc = new PdfDocument(new PdfWriter(baos));
         PdfMerger merger = new PdfMerger(finalDoc);
@@ -261,6 +269,7 @@ public class FluidBalanceService {
      * @throws Exception if there is an error during report generation or email sending
      */
     public void sendReportBalanceFluidForPatientToEmail(Long patientId, Instant startDate, Instant endDate) throws Exception {
+        log.info(" patient Id : {}",patientId);
         List<Object> response = this.getReportBalanceFluidForPatient(patientId, startDate, endDate);
         if (!response.isEmpty()) {
             mailService.sendBalancesMailToUserMail(response,patientId,startDate ,endDate);

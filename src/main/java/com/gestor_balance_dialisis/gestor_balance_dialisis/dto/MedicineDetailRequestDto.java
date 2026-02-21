@@ -12,8 +12,6 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * DTO class for creating or updating a medicine detail record for a patient.
@@ -41,7 +39,7 @@ public class MedicineDetailRequestDto implements Serializable {
 
     @Schema(description = "Medicine id", example = "1")
     @NotNull(message = "Medicine is required")
-    private Long medicineId;
+    private MedicineResponse medicine;
 
     @Schema(description = "Medicine dose", example = "200 mg")
     @NotNull(message = "Dose is required")
@@ -60,5 +58,5 @@ public class MedicineDetailRequestDto implements Serializable {
     private Instant deletionDate;
 
     @Schema(description = "Medicine detail status", example = "ACTIVO")
-    private StatusEnum status;
+    private StatusEnum status = StatusEnum.ACTIVO;
 }

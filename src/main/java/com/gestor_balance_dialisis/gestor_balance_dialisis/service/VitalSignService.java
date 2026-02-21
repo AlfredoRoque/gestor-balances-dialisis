@@ -7,21 +7,22 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.VitalSignDetailRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.VitalSignRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Service for managing vital sign records, including saving new records and retrieving existing ones.
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class VitalSignService {
@@ -37,6 +38,7 @@ public class VitalSignService {
      */
     @Transactional
     public VitalSignResponse save(VitalSignRequest vitalSignRequest) {
+        log.info(" vital sign : {}",vitalSignRequest.getName());
         return new VitalSignResponse(vitalSignRepository.save(new VitalSign(vitalSignRequest)));
     }
 
@@ -58,6 +60,7 @@ public class VitalSignService {
      */
     @Transactional
     public VitalSignDetailResponse saveVitalSignDetail(VitalSignDetailRequest vitalSignDetailRequest) {
+        log.info(" vitalSignName : {}",vitalSignDetailRequest.getVitalSign().getName());
         return new VitalSignDetailResponse(vitalSignDetailRepository.save(new VitalSignDetail(vitalSignDetailRequest)));
     }
 
@@ -69,10 +72,28 @@ public class VitalSignService {
      * @throws BalanceGlobalException if the vital sign detail record to be updated does not exist
      */
     @Transactional
-    public VitalSignDetailResponse updateVitalSignDetail(VitalSignDetailUpdateRequest vitalSignDetailUpdateRequest) {
-        Optional<VitalSignDetail> vitalSignDetail = vitalSignDetailRepository.findById(vitalSignDetailUpdateRequest.getId());
+    public VitalSignDetailResponse updateVitalSignDetail(VitalSignDetailRequest vitalSignDetailUpdateRequest, Long vitalSignDetailId) {
+        log.info(" vitalSignDetailId : {}",vitalSignDetailId);
+        Optional<VitalSignDetail> vitalSignDetail = vitalSignDetailRepository.findById(vitalSignDetailId);
         if(vitalSignDetail.isPresent()){
             return new VitalSignDetailResponse(vitalSignDetailRepository.save(new VitalSignDetail(vitalSignDetail.get(), vitalSignDetailUpdateRequest)));
+        }
+        throw new BalanceGlobalException("Vital sign detail doesn't exist", HttpStatus.CONFLICT.value());
+    }
+
+    /**
+     * Deletes an existing vital sign detail record based on the provided vital sign detail ID.
+     *
+     * @param vitalSignDetailId the ID of the vital sign detail to be deleted
+     * @throws BalanceGlobalException if the vital sign detail record to be deleted does not exist
+     */
+    @Transactional
+    public void deleteVitalSignDetail(Long vitalSignDetailId) {
+        log.info("vitalSignDetailId : {}",vitalSignDetailId);
+        Optional<VitalSignDetail> vitalSignDetail = vitalSignDetailRepository.findById(vitalSignDetailId);
+        if(vitalSignDetail.isPresent()){
+            vitalSignDetailRepository.deleteById(vitalSignDetailId);
+            return;
         }
         throw new BalanceGlobalException("Vital sign detail doesn't exist", HttpStatus.CONFLICT.value());
     }
@@ -84,8 +105,24 @@ public class VitalSignService {
      * @return a list of responses containing the information of the vital sign details for the specified patient and date
      */
     public List<VitalSignDetailResponse> getVitalSignDetailByActualDateAndPatient(Long patientId, Instant actualDate) {
+        log.info(" patientId : {}",patientId);
         return vitalSignDetailRepository.getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatusOrderByDateAsc(
                 Utility.startDay(actualDate),Utility.endDay(actualDate),patientId, StatusEnum.ACTIVO)
+                .stream().map(VitalSignDetailResponse::new).toList();
+    }
+
+    /**
+     * Retrieves a list of vital sign detail records for a specific patient based on a date range and status 'ACTIVO'.
+     *
+     * @param patientId the ID of the patient for whom to retrieve the vital sign details
+     * @param startDate the start date of the date range for which to retrieve the vital sign details
+     * @param endDate   the end date of the date range for which to retrieve the vital sign details
+     * @return a list of responses containing the information of the vital sign details for the specified patient and date range
+     */
+    public List<VitalSignDetailResponse> getVitalSignDetailByDatesAndPatient(Long patientId, Instant startDate, Instant endDate) {
+        log.info("patientId : {}",patientId);
+        return vitalSignDetailRepository.getVitalSignDetailsByDateIsBetweenAndPatientIdAndStatusOrderByDateAsc(
+                Utility.startDay(startDate),Utility.endDay(endDate),patientId, StatusEnum.ACTIVO)
                 .stream().map(VitalSignDetailResponse::new).toList();
     }
 
@@ -99,6 +136,7 @@ public class VitalSignService {
      */
     @Transactional
     public VitalSignResponse updateVitalSign(Long vitalSignId, VitalSignRequest vitalSignRequest) {
+        log.info("vitalSignId : {}",vitalSignId);
         Optional<VitalSign> vitalSign = vitalSignRepository.findById(vitalSignId);
         if(vitalSign.isPresent()){
             vitalSignRequest.setId(vitalSignId);
@@ -115,6 +153,7 @@ public class VitalSignService {
      */
     @Transactional
     public void deleteVitalSign(Long vitalSignId) {
+        log.info(" vitalSignId : {}",vitalSignId);
         Optional<VitalSign> vitalSign = vitalSignRepository.findById(vitalSignId);
         if(vitalSign.isPresent()){
             vitalSignRepository.deleteById(vitalSignId);

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -92,9 +93,23 @@ public class VitalSignController {
      * @return A ResponseEntity containing the updated vital sign detail response and an HTTP status code.
      */
     @Operation(summary = "Update vital sign detail", description = "Endpoint to update a vital sign detail with the provided information.")
-    @PatchMapping("/details/update")
-    public ResponseEntity<VitalSignDetailResponse> updateVitalSignDetail(@Valid @RequestBody VitalSignDetailUpdateRequest vitalSignDetailUpdateRequest) {
-        return ResponseEntity.ok(vitalSignService.updateVitalSignDetail(vitalSignDetailUpdateRequest));
+    @PatchMapping("/details/{vitalSignDetailId}")
+    public ResponseEntity<VitalSignDetailResponse> updateVitalSignDetail(@Valid @RequestBody VitalSignDetailRequest vitalSignDetailUpdateRequest,
+                                                                         @PathVariable Long vitalSignDetailId) {
+        return ResponseEntity.ok(vitalSignService.updateVitalSignDetail(vitalSignDetailUpdateRequest, vitalSignDetailId));
+    }
+
+    /**
+     * Endpoint to delete an existing vital sign detail based on the provided ID.
+     *
+     * @param vitalSignDetailId The ID of the vital sign detail to be deleted.
+     * @return A ResponseEntity with no content and an HTTP status code indicating the result of the deletion operation.
+     */
+    @Operation(summary = "Delete vital sign detail", description = "Endpoint to Delete a vital sign detail with the provided information.")
+    @DeleteMapping("/details/{vitalSignDetailId}")
+    public ResponseEntity<Void> deleteVitalSignDetail(@PathVariable Long vitalSignDetailId) {
+        vitalSignService.deleteVitalSignDetail(vitalSignDetailId);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -104,8 +119,25 @@ public class VitalSignController {
      * @return A ResponseEntity containing a list of vital sign detail responses and an HTTP status code.
      */
     @Operation(summary = "Get vital sign detail for actual date and patient", description = "Endpoint to retrieve vital sign details for a specific patient based on the actual date.")
-    @GetMapping("/details/patients/actual-date/{patientId}")
-    public ResponseEntity<List<VitalSignDetailResponse>> getVitalSignDetailByActualDateAndPatient(@PathVariable Long patientId, @RequestParam Instant actualDate) {
-        return ResponseEntity.ok(vitalSignService.getVitalSignDetailByActualDateAndPatient(patientId, actualDate));
+    @GetMapping("/details/patients/{patientId}/actual-date")
+    public ResponseEntity<List<VitalSignDetailResponse>> getVitalSignDetailByActualDateAndPatient(@PathVariable Long patientId,
+                                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Instant actualDate) {
+        return ResponseEntity.ok(vitalSignService.getVitalSignDetailByActualDateAndPatient(patientId,actualDate));
+    }
+
+    /**
+     * Endpoint to retrieve vital sign details for a specific patient based on a date range.
+     *
+     * @param patientId The ID of the patient for whom to retrieve the vital sign details.
+     * @param startDate The start date of the date range for which to retrieve the vital sign details.
+     * @param endDate   The end date of the date range for which to retrieve the vital sign details (optional).
+     * @return A ResponseEntity containing a list of vital sign detail responses and an HTTP status code.
+     */
+    @Operation(summary = "Get vital sign detail for actual date and patient", description = "Endpoint to retrieve vital sign details for a specific patient based on the actual date.")
+    @GetMapping("/details/patients/{patientId}/dates")
+    public ResponseEntity<List<VitalSignDetailResponse>> getVitalSignDetailByDatesAndPatient(@PathVariable Long patientId,
+                                                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  Instant startDate,
+                                                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant endDate) {
+        return ResponseEntity.ok(vitalSignService.getVitalSignDetailByDatesAndPatient(patientId,startDate,endDate));
     }
 }

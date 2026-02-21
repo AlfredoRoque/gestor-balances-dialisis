@@ -12,8 +12,6 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * DTO class for creating a new vital sign detail record for a patient.
@@ -33,7 +31,7 @@ public class VitalSignDetailRequest implements Serializable {
 
     @Schema(description = "Patient id", example = "1")
     @NotNull(message = "Patient id is required")
-    private Long patient;
+    private Long patientId;
 
     @Schema(description = "Vital sign detail id date", example = "2024-06-01T12:00:00")
     @NotNull(message = "Date is required")
@@ -41,7 +39,7 @@ public class VitalSignDetailRequest implements Serializable {
 
     @Schema(description = "Vital sign id", example = "1")
     @NotNull(message = "Vital sign id is required")
-    private Long vitalSign;
+    private VitalSignResponse vitalSign;
 
     @Schema(description = "Vital sign detail value", example = "120/80")
     @NotNull(message = "Value is required")
@@ -49,5 +47,5 @@ public class VitalSignDetailRequest implements Serializable {
     private String value;
 
     @Schema(description = "Vital sign detail status", example = "ACTIVE")
-    private StatusEnum status;
+    private StatusEnum status = StatusEnum.ACTIVO;
 }

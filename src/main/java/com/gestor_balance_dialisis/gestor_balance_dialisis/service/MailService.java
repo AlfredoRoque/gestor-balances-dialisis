@@ -5,6 +5,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.PatientRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,7 @@ public class MailService {
      * @throws MessagingException if there is an error while sending the email.
      */
     public void sendMailToRecoverPassword(User user, String temporaryPassword) throws MessagingException {
+        log.info(" for user: {}",user.getUsername());
 
         Context context = new Context();
         context.setVariable("userName", user.getUsername());
@@ -77,6 +79,7 @@ public class MailService {
      * @throws IOException        if there is an error while creating or writing to the temporary file for the PDF attachment.
      */
     public void sendBalancesMailToUserMail(List<Object> response, Long patientId, Instant startDate, Instant endDate) throws MessagingException, IOException {
+        log.info(" patientId : {}",patientId);
         Optional<Patient> patient = patientRepository.findById(patientId);
         if(patient.isPresent()) {
             Context context = new Context();

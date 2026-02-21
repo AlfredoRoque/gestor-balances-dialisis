@@ -4,8 +4,10 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.UserDto;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.UserRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 /**
  * Service for managing user-related operations, including finding users by username or email and saving new users with encrypted passwords.
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -28,6 +31,7 @@ public class UserService {
      * @throws BalanceGlobalException if the user is not found.
      */
     public User findByUsername(String username) {
+        log.info(" user name : {}",username);
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new BalanceGlobalException("Usuario no encontrado",HttpStatus.NOT_FOUND.value()));
     }
@@ -40,6 +44,7 @@ public class UserService {
      */
     @Transactional
     public UserDto save(UserDto user) {
+        log.info("user name : {}",user.getUsername());
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new BalanceGlobalException("Ya existe un usuario asignado al correo con el que intentas registrarte.", HttpStatus.CONFLICT.value());
         } else if (userRepository.findByUsername(user.getUsername()).isPresent()) {
@@ -55,6 +60,7 @@ public class UserService {
      * @throws BalanceGlobalException if the user is not found.
      */
     public User findByEmail(String email) {
+        log.info(" user mail : {}",email);
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new BalanceGlobalException("Usuario no encontrado",HttpStatus.NOT_FOUND.value()));
     }
@@ -66,6 +72,7 @@ public class UserService {
      */
     @Transactional
     public void updatePassword(UserDto user) {
+        log.info(" userName : {}",user.getUsername());
         new UserDto(userRepository.save(new User(user, passwordEncoder.encode(user.getPassword()))));
     }
 }

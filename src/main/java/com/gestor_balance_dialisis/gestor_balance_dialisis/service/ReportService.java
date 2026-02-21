@@ -3,7 +3,9 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.service;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.*;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.core.io.ClassPathResource;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
  * Service responsible for generating reports based on fluid balance data, including details about fluid balances, medicines, and vital signs.
  * It utilizes JasperReports to create PDF reports from the provided data.
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ReportService {
@@ -35,7 +38,7 @@ public class ReportService {
      * @throws Exception if an error occurs during report generation
      */
     public byte[] generateReport(List<CalculateFluidBalanceResponseDto> fluidBalanceResponse) throws Exception {
-
+        log.info(" balances size : {}",fluidBalanceResponse.size());
         List<VitalSignResponse> allVitalSigns = vitalSignService.getAllVitalSigns();
         InputStream mainStream = new ClassPathResource("/reports/Dialisis_main.jasper").getInputStream();
 

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -36,8 +35,34 @@ public class ExtraFluidController {
      */
     @Operation(summary = "Save a new extra fluid", description = "Endpoint to save a new extra fluid record with the provided information.")
     @PostMapping("/save")
-    public ResponseEntity<ExtraFluidResponseDto> saveVitalSign(@Valid @RequestBody ExtraFluidRequestDto extraFluidRequestDto) {
+    public ResponseEntity<ExtraFluidResponseDto> saveExtraFluid(@Valid @RequestBody ExtraFluidRequestDto extraFluidRequestDto) {
         return ResponseEntity.created(URI.create("/api/extra-fluids/save")).body(extraFluidService.save(extraFluidRequestDto));
+    }
+
+    /**
+     * Endpoint to update an existing extra fluid record with the provided information.
+     *
+     * @param extraFluidRequestDto The request body containing the updated details of the extra fluid record.
+     * @param extraFluidId        The ID of the extra fluid record to be updated.
+     * @return A ResponseEntity containing the updated extra fluid response and an HTTP status code.
+     */
+    @Operation(summary = "Update a extra fluid", description = "Endpoint to update a extra fluid record with the provided information.")
+    @PatchMapping("/{extraFluidId}")
+    public ResponseEntity<ExtraFluidResponseDto> updateExtraFluid(@Valid @RequestBody ExtraFluidRequestDto extraFluidRequestDto, @PathVariable Long extraFluidId) {
+        return ResponseEntity.ok(extraFluidService.updateExtraFluid(extraFluidId, extraFluidRequestDto));
+    }
+
+    /**
+     * Endpoint to delete an existing extra fluid record with the provided information.
+     *
+     * @param extraFluidId The ID of the extra fluid record to be deleted.
+     * @return A ResponseEntity with an HTTP status code indicating the result of the delete operation.
+     */
+    @Operation(summary = "Delete a extra fluid", description = "Endpoint to delete a extra fluid record with the provided information.")
+    @DeleteMapping("/{extraFluidId}")
+    public ResponseEntity<ExtraFluidResponseDto> deleteExtraFluid(@PathVariable Long extraFluidId) {
+        extraFluidService.deleteExtraFluid(extraFluidId);
+        return ResponseEntity.noContent().build();
     }
 
     /**

@@ -4,8 +4,10 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PatientRequest;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PatientResponse;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.PatientRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 /**
  * Service for managing patient records, including saving new patients and retrieving existing ones by user ID.
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PatientService {
@@ -27,6 +30,7 @@ public class PatientService {
      */
     @Transactional
     public PatientResponse save(PatientRequest patientRequest) {
+        log.info(" userId : {}",patientRequest.getUserId());
         return new PatientResponse(patientRepository.save(new Patient(patientRequest)));
     }
 
@@ -37,6 +41,7 @@ public class PatientService {
      * @return A list of patient responses associated with the specified user ID.
      */
     public List<PatientResponse> findByUserId(Long userId) {
+        log.info("userId : {}",userId);
         return patientRepository.findByUserId(userId)
                 .stream().map(PatientResponse::new).toList();
     }
@@ -50,6 +55,7 @@ public class PatientService {
      */
     @Transactional
     public PatientResponse updatePatient(PatientRequest patientRequest,Long patientId) {
+        log.info(" patientId : {}",patientId);
         patientRequest.setId(patientId);
         return new PatientResponse(patientRepository.save(new Patient(patientRequest)));
     }
@@ -61,6 +67,7 @@ public class PatientService {
      */
     @Transactional
     public void deletePatient(Long patientId) {
+        log.info("patientId : {}",patientId);
         patientRepository.deleteById(patientId);
     }
 }

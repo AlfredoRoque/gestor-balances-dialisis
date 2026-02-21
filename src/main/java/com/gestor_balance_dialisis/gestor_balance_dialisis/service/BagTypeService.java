@@ -4,8 +4,10 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.BagTypeRequest;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.BagTypeResponse;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.BagType;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.BagTypeRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 /**
  * Service for managing bag types, including saving new bag types and retrieving existing ones.
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BagTypeService {
@@ -27,6 +30,7 @@ public class BagTypeService {
      */
     @Transactional
     public BagTypeResponse save(BagTypeRequest bagTypeRequest) {
+        log.info("param : {}",bagTypeRequest.getType());
         return new BagTypeResponse(bagTypeRepository.save(new BagType(bagTypeRequest)));
     }
 

@@ -2,7 +2,6 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.MedicineDetailRequestDto;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.MedicineDetailUpdateRequestDto;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,8 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * Entity class representing the details of a medicine prescribed to a patient.
@@ -68,7 +65,7 @@ public class MedicineDetail {
         this.id = medicineDetailRequest.getId();
         this.patient = new Patient(medicineDetailRequest.getPatientId());
         this.date = medicineDetailRequest.getDate();
-        this.medicine = new Medicine(medicineDetailRequest.getMedicineId());
+        this.medicine = new Medicine(medicineDetailRequest.getMedicine().getId());
         this.dose = medicineDetailRequest.getDose();
         this.frequency = medicineDetailRequest.getFrequency();
         this.modificationDate = medicineDetailRequest.getModificationDate();
@@ -83,7 +80,7 @@ public class MedicineDetail {
      * @param medicineDetailUpdateRequestDto The MedicineDetailUpdateRequestDto containing the updated information for the MedicineDetail entity.
      * @param modificationOrDeletionDate The date of modification or deletion, depending on the status provided in the update request.
      */
-    public MedicineDetail(MedicineDetail medicineDetail, MedicineDetailUpdateRequestDto medicineDetailUpdateRequestDto, Instant modificationOrDeletionDate) {
+    public MedicineDetail(MedicineDetail medicineDetail, MedicineDetailRequestDto medicineDetailUpdateRequestDto, Instant modificationOrDeletionDate) {
         this.id = medicineDetail.getId();
         this.patient = medicineDetail.getPatient();
         this.date = medicineDetail.getDate();

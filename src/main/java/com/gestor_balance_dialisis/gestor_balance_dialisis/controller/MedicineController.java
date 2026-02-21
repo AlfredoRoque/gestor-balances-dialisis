@@ -91,9 +91,23 @@ public class MedicineController {
      * @return a response containing the updated medicine detail information
      */
     @Operation(summary = "Update medicine detail", description = "Endpoint to update a medicine detail with the provided information.")
-    @PatchMapping("/details/update")
-    public ResponseEntity<MedicineDetailResponseDto> updateVitalSignDetail(@Valid @RequestBody MedicineDetailUpdateRequestDto medicineDetailRequestDto) {
-        return ResponseEntity.ok(medicineService.updateMedicineDetail(medicineDetailRequestDto));
+    @PatchMapping("/details/{medicineDetailId}")
+    public ResponseEntity<MedicineDetailResponseDto> updateVitalSignDetail(@Valid @RequestBody MedicineDetailRequestDto medicineDetailRequestDto,
+                                                                           @PathVariable Long medicineDetailId) {
+        return ResponseEntity.ok(medicineService.updateMedicineDetail(medicineDetailId, medicineDetailRequestDto));
+    }
+
+    /**
+     * Endpoint to delete a medicine detail with the provided information.
+     *
+     * @param medicineDetailId the ID of the medicine detail to be deleted
+     * @return a response containing the information of the deleted medicine detail
+     */
+    @Operation(summary = "Delete medicine detail", description = "Endpoint to delete a medicine detail with the provided information.")
+    @DeleteMapping("/details/{medicineDetailId}")
+    public ResponseEntity<Void> deleteVitalSignDetail(@PathVariable Long medicineDetailId) {
+        medicineService.deleteMedicineDetail(medicineDetailId);
+        return ResponseEntity.noContent().build();
     }
 
     /**
