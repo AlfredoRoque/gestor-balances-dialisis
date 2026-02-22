@@ -1,5 +1,7 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.security;
 
+import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -9,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 /**
@@ -28,11 +33,10 @@ public class JwtUtil {
      * @param username The username for which the token is generated.
      * @return A JWT token containing the username as the subject, with an expiration time of 30 minutes.
      */
-    public String generateToken(String username,Long userId,String timeZone) {
+    public String generateToken(String username, User user, String timeZone) {
         return Jwts.builder()
+                .setClaims(SecurityUtils.getUserClaims(user, timeZone))
                 .setSubject(username)
-                .claim("zone", timeZone)
-                .setId(String.valueOf(userId))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // Token expires in 30 minutes
                 .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()), SignatureAlgorithm.HS256)

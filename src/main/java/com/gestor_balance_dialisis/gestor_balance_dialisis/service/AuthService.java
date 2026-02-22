@@ -3,7 +3,10 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.service;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.*;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.UserRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.security.JwtUtil;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.security.RsaKeyService;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Service class for handling authentication-related operations such as login, email validation, and password recovery.
@@ -22,9 +28,10 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final JwtUtil jwtUtil;
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final RsaKeyService rsaKeyService;
 
     /**
      * Authenticate a user with username and password, returns a JWT token if successful.
@@ -35,13 +42,23 @@ public class AuthService {
      */
     public JwtResponse login(LoginRequest request) {
         log.info("for user: {}",request.getUsername());
-        User user = userService.findByUsername(request.getUsername());
-        if (!passwordEncoder.matches(
-                request.getPassword(),
-                user.getPassword())) {
+        Optional<User> user = userRepository.findByUsername(request.getUsername());
+        user.orElseThrow(() -> new BalanceGlobalException("User not found", HttpStatus.NOT_FOUND.value()));
+
+        String rawPassword;
+        try {
+            rawPassword = rsaKeyService.decrypt(request.getPassword());
+        } catch (Exception e) {
+            log.warn("Password decryption failed for user {}: {}", request.getUsername(), e.getMessage());
             throw new BalanceGlobalException("Invalid credentials", HttpStatus.CONFLICT.value());
         }
-        return new JwtResponse(jwtUtil.generateToken(request.getUsername(),user.getId(),request.getTimeZone()));
+
+        if (!passwordEncoder.matches(rawPassword, user.get().getPassword())) {
+            throw new BalanceGlobalException("Invalid credentials", HttpStatus.CONFLICT.value());
+        }
+        user.get().setTokenVersion(Long.parseLong(String.valueOf(ThreadLocalRandom.current().nextInt(1, 10_000_001))));
+        userRepository.save(user.get());
+        return new JwtResponse(jwtUtil.generateToken(request.getUsername(), user.get(), request.getTimeZone()));
     }
 
     /**
@@ -52,7 +69,7 @@ public class AuthService {
      */
     public void validateMail(String email) {
         log.info("for : {}",email);
-        userService.findByEmail(email);
+        userRepository.findByEmail(email).orElseThrow(() -> new BalanceGlobalException("Invalid credentials", HttpStatus.NOT_FOUND.value()));;
     }
 
     /**
@@ -67,14 +84,29 @@ public class AuthService {
     @Async
     public void recoverPassword(String email) throws MessagingException {
         log.info("for {}: ",email);
-        User user = userService.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(email);
+        user.orElseThrow(() -> new BalanceGlobalException("User not found", HttpStatus.NOT_FOUND.value()));
         String temporaryPassword = Utility.generateTemporaryPassword(10);
         try {
-            userService.updatePassword(new UserDto(user,temporaryPassword));
+            user.get().setPassword(passwordEncoder.encode(temporaryPassword));
+            userRepository.save(user.get());
         }catch (Exception e){
-            throw new BalanceGlobalException("Error al actualizar la contraseña", HttpStatus.CONFLICT.value());
+            throw new BalanceGlobalException("Error for recover password", HttpStatus.CONFLICT.value());
         }
         //create and send email to user with temporary password
-        mailService.sendMailToRecoverPassword(user,temporaryPassword);
+        mailService.sendMailToRecoverPassword(user.get(),temporaryPassword);
+    }
+
+    /**
+     * Logout a user by invalidating their existing JWT tokens.
+     *
+     * @throws BalanceGlobalException if the user is not found.
+     */
+    public void logout() {
+        Optional<User> user = userRepository.findById(SecurityUtils.getUserId());
+        user.orElseThrow(() -> new BalanceGlobalException("User not found", HttpStatus.NOT_FOUND.value()));
+        // Increment the token version to invalidate existing tokens
+        user.get().setTokenVersion(user.get().getTokenVersion() + 1);
+        userRepository.save(user.get());
     }
 }

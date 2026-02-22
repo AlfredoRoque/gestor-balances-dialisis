@@ -4,7 +4,6 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.UserDto;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.UserRepository;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,7 @@ public class UserService {
     public User findByUsername(String username) {
         log.info(" user name : {}",username);
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new BalanceGlobalException("Usuario no encontrado",HttpStatus.NOT_FOUND.value()));
+                .orElseThrow(() -> new BalanceGlobalException("User not found",HttpStatus.NOT_FOUND.value()));
     }
 
     /**
