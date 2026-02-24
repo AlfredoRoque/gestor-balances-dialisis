@@ -29,4 +29,8 @@ public class VitalSignRequest implements Serializable {
     @NotBlank(message = "Vital sign name is required")
     @NotNull(message = "Vital sign name is required")
     private String name;
+
+    @Schema(description = "Medicine userId", example = "1")
+    @NotNull(message = "User id is required")
+    private Long userId;
 }

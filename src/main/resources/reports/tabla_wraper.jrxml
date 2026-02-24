@@ -3,6 +3,7 @@
 	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
 	<parameter name="VITAL_SIGNS" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="MEDICINES" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="COLUMNS" class="java.util.List"/>
 	<detail>
 		<band height="220" splitType="Prevent">
 			<element kind="subreport" uuid="3f583de5-e1e7-4464-97c2-6af705eb0b0e" x="0" y="20" width="277" height="200">
@@ -10,6 +11,9 @@
 				<expression><![CDATA[$P{SUBREPORT_DIR} + "tabla_signos.jasper"]]></expression>
 				<parameter name="SUBREPORT_DIR">
 					<expression><![CDATA[$P{SUBREPORT_DIR}]]></expression>
+				</parameter>
+				<parameter name="COLUMNS">
+					<expression><![CDATA[$P{COLUMNS}]]></expression>
 				</parameter>
 			</element>
 			<element kind="subreport" uuid="c85823f0-1875-456b-b4ab-03237e9b195e" x="278" y="20" width="277" height="200">

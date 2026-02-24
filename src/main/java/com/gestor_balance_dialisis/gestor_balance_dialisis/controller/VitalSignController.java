@@ -44,8 +44,8 @@ public class VitalSignController {
      */
     @Operation(summary = "Get all vital signs", description = "Endpoint to retrieve all vital signs available in the system.")
     @GetMapping
-    public ResponseEntity<List<VitalSignResponse>> getAllVitalSigns() {
-        return ResponseEntity.ok(vitalSignService.getAllVitalSigns());
+    public ResponseEntity<List<VitalSignResponse>> getAllVitalSignsByUser() {
+        return ResponseEntity.ok(vitalSignService.getAllVitalSignsByUser());
     }
 
     /**

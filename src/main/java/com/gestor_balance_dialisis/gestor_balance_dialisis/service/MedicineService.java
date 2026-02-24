@@ -47,8 +47,8 @@ public class MedicineService {
      *
      * @return a list of responses containing the information of all medicines
      */
-    public List<MedicineResponse> getAllMedicines() {
-        return medicineRepository.findAll()
+    public List<MedicineResponse> getAllMedicinesByUser() {
+        return medicineRepository.getAllMedicinesByUserId(SecurityUtils.getUserId())
                 .stream().map(MedicineResponse::new).toList();
     }
 

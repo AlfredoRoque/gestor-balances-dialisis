@@ -36,14 +36,14 @@ public class MedicineController {
     }
 
     /**
-     * Endpoint to retrieve all medicines available in the system.
+     * Endpoint to retrieve all medicines for the current user.
      *
-     * @return a list of responses containing the information of all medicines
+     * @return a list of responses containing the information of all medicines belonging to the user
      */
     @Operation(summary = "Get all Medicines", description = "Endpoint to retrieve all medicines available in the system.")
     @GetMapping
-    public ResponseEntity<List<MedicineResponse>> getAllMedicines() {
-        return ResponseEntity.ok(medicineService.getAllMedicines());
+    public ResponseEntity<List<MedicineResponse>> getAllMedicinesByUser() {
+        return ResponseEntity.ok(medicineService.getAllMedicinesByUser());
     }
 
     /**

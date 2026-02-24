@@ -10,21 +10,20 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Data Transfer Object (DTO) for representing a vital sign report related to dialysis.
+ * This DTO contains information about the day of the check, blood pressure value, and glucose value.
+ */
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class VitalSignReportDto implements Serializable {
+public class VitalSignDialysisReportDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Day check", example = "01/01/2024")
-    private String day;
+    private List<String> columns;
+    private List<RowDto> rows;
 
-    @Schema(description = "Blood pressure value", example = "120/80")
-    private String bloodPressure;
-
-    @Schema(description = "Glucose value", example = "90")
-    private String glucose;
 }

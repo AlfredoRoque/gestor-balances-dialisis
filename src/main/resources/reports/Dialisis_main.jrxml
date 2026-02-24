@@ -4,6 +4,7 @@
 	<parameter name="VITAL_SIGNS" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="MEDICINES" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
+	<parameter name="COLUMNS" class="java.util.List"/>
 	<title height="80">
 		<element kind="staticText" uuid="cee6c0a7-093c-4dfd-81aa-d96fcb018e43" x="0" y="0" width="555" height="20" fontSize="13.0" bold="true" hTextAlign="Center">
 			<text><![CDATA[GOBIERNO DE MÉXICO / IMSS BIENESTAR]]></text>
@@ -32,6 +33,9 @@
 			</parameter>
 			<parameter name="MEDICINES">
 				<expression><![CDATA[$P{MEDICINES}]]></expression>
+			</parameter>
+			<parameter name="COLUMNS">
+				<expression><![CDATA[$P{COLUMNS}]]></expression>
 			</parameter>
 		</element>
 	</summary>

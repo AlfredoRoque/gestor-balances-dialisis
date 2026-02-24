@@ -29,4 +29,8 @@ public class MedicineRequest implements Serializable {
     @NotBlank(message = "Medicine name is required")
     @NotNull(message = "Medicine name is required")
     private String name;
+
+    @Schema(description = "Medicine userId", example = "1")
+    @NotNull(message = "User id is required")
+    private Long userId;
 }

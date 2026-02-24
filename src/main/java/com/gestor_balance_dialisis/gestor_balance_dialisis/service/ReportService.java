@@ -1,20 +1,17 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.service;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.*;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,7 +36,7 @@ public class ReportService {
      */
     public byte[] generateReport(List<CalculateFluidBalanceResponseDto> fluidBalanceResponse) throws Exception {
         log.info(" balances size : {}",fluidBalanceResponse.size());
-        List<VitalSignResponse> allVitalSigns = vitalSignService.getAllVitalSigns();
+        List<VitalSignResponse> allVitalSigns = vitalSignService.getAllVitalSignsByUser();
         InputStream mainStream = new ClassPathResource("/reports/Dialisis_main.jasper").getInputStream();
 
         Map<String, Object> params = new HashMap<>();
@@ -71,33 +68,18 @@ public class ReportService {
                 .flatMap(response -> response.getFluidBalances().stream())
                 .toList()));
 
-        Map<String, VitalSignReportDto> map = new LinkedHashMap<>();
-
         List<VitalSignDetailResponse> vitalSignFiltered = fluidBalanceResponse.stream()
                 .flatMap(response -> response.getVitalSignDetails().stream())
                 .collect(Collectors.toMap(v -> v.getDate() + "-" + v.getVitalSign().getId(), // llave unica
                         v -> v, (v1, v2) -> v1 // si hay repetido se queda con el primero
                 )).values().stream().sorted(Comparator.comparing(VitalSignDetailResponse::getDate)).toList();
 
-        VitalSignResponse vitalSignPressure = allVitalSigns.stream().
-                filter(v -> Objects.equals(v.getName(), "Presión Arterial")).findFirst().orElseThrow(() -> new BalanceGlobalException("Vital sign not found", HttpStatus.CONFLICT.value()));
-        VitalSignResponse vitalSignGlucose = allVitalSigns.stream().
-                filter(v -> Objects.equals(v.getName(), "Glucosa")).findFirst().orElseThrow(() -> new BalanceGlobalException("Vital sign not found", HttpStatus.CONFLICT.value()));
-        for (VitalSignDetailResponse v : vitalSignFiltered) {
-            String day = v.getDate().atZone(zone).format(formatterDay);
-            map.putIfAbsent(day, new VitalSignReportDto(day, null, null));
-            VitalSignReportDto dto = map.get(day);
-            Long vitalSignId = v.getVitalSign().getId();
-            if (Objects.equals(vitalSignId, vitalSignPressure.getId())) { // bloodPressure
-                dto.setBloodPressure(v.getValue());
-            }
-            if (Objects.equals(vitalSignId, vitalSignGlucose.getId())) { // glucose
-                dto.setGlucose(v.getValue());
-            }
-        }
-        List<VitalSignReportDto> reportList = new ArrayList<>(map.values());
 
-        params.put("VITAL_SIGNS", new JRBeanCollectionDataSource(reportList));
+        VitalSignDialysisReportDto reportDto = buildTable(vitalSignFiltered);
+        params.put("VITAL_SIGNS",
+                new JRBeanCollectionDataSource(reportDto.getRows()));
+        params.put("COLUMNS", reportDto.getColumns());
+
         params.put("MEDICINES", new JRBeanCollectionDataSource(fluidBalanceResponse.stream()
                 .flatMap(response -> response.getMedicineDetails().stream())
                 .collect(Collectors.toMap(
@@ -108,5 +90,44 @@ public class ReportService {
         JasperPrint print = JasperFillManager.fillReport(mainStream, params, new JREmptyDataSource());
 
         return JasperExportManager.exportReportToPdf(print);
+    }
+
+    /**
+     * Builds a VitalSignDialysisReportDto object based on the provided list of VitalSignDetailResponse objects.
+     *
+     * @param vitalSigns the list of VitalSignDetailResponse objects containing the vital sign details to be included in the report
+     * @return a VitalSignDialysisReportDto object containing the columns and rows for the report
+     */
+    public VitalSignDialysisReportDto buildTable(List<VitalSignDetailResponse> vitalSigns) {
+        DateTimeFormatter formatterDay = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        // Get unique and sorted column names
+        List<String> columns = vitalSigns.stream()
+                .map(v -> v.getVitalSign().getName())
+                .distinct()
+                .sorted()
+                .toList();
+        // group by date and create a map of vital sign name to value
+        Map<Instant, Map<String, String>> groupedByDate =
+                vitalSigns.stream()
+                        .collect(Collectors.groupingBy(
+                                VitalSignDetailResponse::getDate,
+                                Collectors.toMap(
+                                        v -> v.getVitalSign().getName(),
+                                        VitalSignDetailResponse::getValue,
+                                        (v1, v2) -> v1 // si hay duplicados
+                                )
+                        ));
+
+        // create a list of RowDto objects sorted by date
+        List<RowDto> rows = groupedByDate.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> new RowDto(entry.getKey(), entry.getValue()))
+                .toList();
+
+        rows.forEach(rowDto -> {
+            String day = rowDto.getDate().atZone(SecurityUtils.getUserZone()).format(formatterDay);
+            rowDto.setDay(day);
+        });
+        return new VitalSignDialysisReportDto(columns, rows);
     }
 }

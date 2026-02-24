@@ -1,5 +1,6 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.MedicineRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,12 @@ public class Medicine {
     @Column(name = "nombre", nullable = false, length = 150)
     private String name;
 
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario", nullable = false)
+    private User user;
+
+
     /**
      * Constructs a Medicine entity from a MedicineRequest DTO.
      *
@@ -35,6 +42,7 @@ public class Medicine {
     public Medicine(MedicineRequest medicineRequest) {
         this.id = medicineRequest.getId();
         this.name = medicineRequest.getName();
+        this.user = new User(medicineRequest.getUserId());
     }
 
     /**

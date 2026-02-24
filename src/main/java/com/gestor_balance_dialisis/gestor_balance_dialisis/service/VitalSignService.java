@@ -47,8 +47,8 @@ public class VitalSignService {
      *
      * @return a list of responses containing the information of all vital signs
      */
-    public List<VitalSignResponse> getAllVitalSigns() {
-        return vitalSignRepository.findAll()
+    public List<VitalSignResponse> getAllVitalSignsByUser() {
+        return vitalSignRepository.findByUserId(SecurityUtils.getUserId())
                 .stream().map(VitalSignResponse::new).toList();
     }
 
