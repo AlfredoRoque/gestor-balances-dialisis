@@ -1,11 +1,13 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.service;
 
+import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.MailTemplate;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.MailTemplateRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.PatientRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.TEMPLATE_ENUM;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +20,10 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +40,7 @@ public class MailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
     private final PatientRepository patientRepository;
+    private final MailTemplateRepository mailTemplateRepository;
 
     /**
      * Email the user with a temporary password for password recovery.
@@ -52,11 +52,14 @@ public class MailService {
     public void sendMailToRecoverPassword(User user, String temporaryPassword) throws MessagingException {
         log.info(" for user: {}",user.getUsername());
 
+        MailTemplate template = mailTemplateRepository
+                .findByName(TEMPLATE_ENUM.TEMPLATE_RECOVER_PASSWORD.getValue());
+
         Context context = new Context();
         context.setVariable("userName", user.getUsername());
         context.setVariable("password", temporaryPassword);
 
-        String htmlContent = templateEngine.process("recover-password-email", context);
+        String htmlContent = templateEngine.process(template.getContent(), context);
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -82,11 +85,14 @@ public class MailService {
         log.info(" patientId : {}",patientId);
         Optional<Patient> patient = patientRepository.findById(patientId);
         if(patient.isPresent()) {
+            MailTemplate template = mailTemplateRepository
+                    .findByName(TEMPLATE_ENUM.TEMPLATE_BALANCE_REPORT.getValue());
+
             Context context = new Context();
             context.setVariable("userName", patient.get().getUser().getUsername());
             context.setVariable("patientName", patient.get().getName());
 
-            String htmlContent = templateEngine.process("send-balance-email", context);
+            String htmlContent = templateEngine.process(template.getContent(), context);
 
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -101,13 +107,13 @@ public class MailService {
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.write((byte[]) response.get(0));
             } catch (IOException e) {
-                log.error("Error al escribir el archivo temporal: {}", String.valueOf(e));
+                log.error("Error writing the temporary file: {}", String.valueOf(e));
             }
             helper.addAttachment((String) response.get(2),tempFile);
 
             mailSender.send(message);
             return;
         }
-        throw new BalanceGlobalException("No se encontró el paciente con ID: " + patientId, HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException("Patient with ID was not found: " + patientId, HttpStatus.CONFLICT.value());
     }
 }

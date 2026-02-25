@@ -38,7 +38,7 @@ public class UserDto implements Serializable {
     @NotNull(message = "Username is required")
     private String username;
 
-    @Schema(description = "User password", example = "15yuytui2j3j")
+    @Schema(description = "User password", example = "P@ssw0rd")
     @NotBlank(message = "Password is required")
     @NotNull(message = "Password is required")
     private String password;

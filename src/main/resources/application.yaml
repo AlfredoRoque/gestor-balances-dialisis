@@ -1,24 +1,30 @@
 spring:
-  application:
-    name: gestor-balance-dialisis
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   datasource:
-    url: 'jdbc:postgresql://localhost:5432/gestor_dialisis'
-    username: 'alfredoroque'
-    password: ''
+    url: ${DATABASE_URL}
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update   # create | create-drop | validate | none
-    show-sql: true
+      ddl-auto: update
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
-
-  sql:
-    init:
-      mode: never
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
-  port: 8080
+  port: ${PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET}

@@ -45,13 +45,7 @@ public class AuthService {
         Optional<User> user = userRepository.findByUsername(request.getUsername());
         user.orElseThrow(() -> new BalanceGlobalException("User not found", HttpStatus.NOT_FOUND.value()));
 
-        String rawPassword;
-        try {
-            rawPassword = rsaKeyService.decrypt(request.getPassword());
-        } catch (Exception e) {
-            log.warn("Password decryption failed for user {}: {}", request.getUsername(), e.getMessage());
-            throw new BalanceGlobalException("Invalid credentials", HttpStatus.CONFLICT.value());
-        }
+        String rawPassword = SecurityUtils.decryptPassword(request.getPassword(),rsaKeyService);
 
         if (!passwordEncoder.matches(rawPassword, user.get().getPassword())) {
             throw new BalanceGlobalException("Invalid credentials", HttpStatus.CONFLICT.value());
