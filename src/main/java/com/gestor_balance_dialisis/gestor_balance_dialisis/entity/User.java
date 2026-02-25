@@ -52,7 +52,7 @@ public class User {
     private Instant creationDate;
 
     @Column(name = "sesion_version", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
-    private Long tokenVersion;
+    private Long tokenVersion = 0L;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

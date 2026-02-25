@@ -15,6 +15,9 @@
 	<variable name="CONTADOR" calculation="Count" class="java.lang.Integer">
 		<expression><![CDATA[$F{changeNumber}]]></expression>
 	</variable>
+	<variable name="FIRST_TOTAL_INGESTED" resetType="Group" calculation="First" resetGroup="GRP_BLOQUE" class="java.math.BigDecimal">
+		<expression><![CDATA[$F{totalIngested}]]></expression>
+	</variable>
 	<group name="GRP_BLOQUE">
 		<expression><![CDATA[($V{REPORT_COUNT}-1)/5]]></expression>
 		<groupHeader>
@@ -221,7 +224,7 @@ en 24h]]></text>
 					</box>
 				</element>
 				<element kind="textField" uuid="fb49f240-4784-476a-b417-03d5d154e47d" x="489" y="4" width="65" height="18" fontSize="8.0" hTextAlign="Center">
-					<expression><![CDATA[$F{totalIngested}]]></expression>
+					<expression><![CDATA[$V{FIRST_TOTAL_INGESTED}]]></expression>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>

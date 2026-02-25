@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 @Service
 public class ReportService {
 
-    private final VitalSignService vitalSignService;
-
     /**
      * Generates a PDF report based on the provided list of CalculateFluidBalanceResponseDto objects.
      *
@@ -36,7 +34,6 @@ public class ReportService {
      */
     public byte[] generateReport(List<CalculateFluidBalanceResponseDto> fluidBalanceResponse) throws Exception {
         log.info(" balances size : {}",fluidBalanceResponse.size());
-        List<VitalSignResponse> allVitalSigns = vitalSignService.getAllVitalSignsByUser();
         InputStream mainStream = new ClassPathResource("/reports/Dialisis_main.jasper").getInputStream();
 
         Map<String, Object> params = new HashMap<>();

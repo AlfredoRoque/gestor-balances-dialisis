@@ -121,15 +121,13 @@ public class FluidBalanceService {
             log.info("range : {} {}",startDate,endDate);
             ZoneId zone = SecurityUtils.getUserZone();
 
-            LocalDate start = startDate.atZone(zone).toLocalDate();
-            LocalDate end = endDate.atZone(zone).toLocalDate();
+            LocalDate start = LocalDateTime.ofInstant(startDate, zone).toLocalDate();
+            LocalDate end = LocalDateTime.ofInstant(endDate, zone).toLocalDate();
 
             for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
 
                 Instant actualStartDate = date.atStartOfDay(zone).toInstant();
-                Instant actualEndDate = date.atTime(LocalTime.MAX)
-                        .atZone(zone)
-                        .toInstant();
+                Instant actualEndDate = date.plusDays(1).atStartOfDay(zone).toInstant().minusMillis(1);
 
                 CalculateFluidBalanceResponseDto balanceInformation =
                         this.getBalancesInformation(date.atStartOfDay(zone).toInstant(), patientId, actualStartDate, actualEndDate);
@@ -184,8 +182,13 @@ public class FluidBalanceService {
         response.setPartialBalance(response.getFluidBalances().stream().map(FluidBalanceResponse::getUltrafiltration).reduce(BigDecimal.ZERO, BigDecimal::add));
         response.setTotalBalance(response.getPartialBalance().add(response.getTotalUrine()));
         response.getFluidBalances().forEach(fluidBalance -> {
-            fluidBalance.setTotalUrine(response.getTotalUrine());
-            fluidBalance.setTotalIngested(response.getTotalIngested());
+            if(response.getFluidBalances().indexOf(fluidBalance)==0){
+                fluidBalance.setTotalUrine(response.getTotalUrine());
+                fluidBalance.setTotalIngested(response.getTotalIngested());
+            }else{
+                fluidBalance.setTotalUrine(BigDecimal.ZERO);
+                fluidBalance.setTotalIngested(BigDecimal.ZERO);
+            }
             fluidBalance.setPartialBalance(response.getPartialBalance());
             fluidBalance.setTotalBalance(response.getTotalBalance());
         });

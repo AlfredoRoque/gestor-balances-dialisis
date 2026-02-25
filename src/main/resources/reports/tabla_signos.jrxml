@@ -10,6 +10,9 @@
 	<columnHeader height="20">
 		<element kind="staticText" uuid="089ffaf4-33ba-4f0d-b06c-36655b189cab" x="0" y="0" width="90" height="20" fontSize="8.0" bold="true" hTextAlign="Center">
 			<text><![CDATA[Fecha]]></text>
+			<box>
+				<pen lineWidth="0.75" lineStyle="Solid"/>
+			</box>
 		</element>
 		<element kind="component" uuid="b42cde57-35c3-4ad7-944a-465d0a9ff4e4" x="90" y="0" width="465" height="20">
 			<component kind="list" printOrder="Horizontal">
@@ -21,6 +24,9 @@
 				<contents height="20" width="90">
 					<element kind="textField" uuid="fc56d300-e4cd-4dc6-a7bc-adf8c299caed" x="0" y="0" width="90" height="20" fontSize="8.0" bold="true" hTextAlign="Center">
 						<expression><![CDATA[$F{_THIS}]]></expression>
+						<box>
+							<pen lineWidth="0.75" lineStyle="Solid"/>
+						</box>
 					</element>
 				</contents>
 			</component>
@@ -30,6 +36,9 @@
 		<band height="18">
 			<element kind="textField" uuid="dc259644-7747-41ab-b443-b1f901a8d738" x="0" y="0" width="90" height="18" fontSize="8.0" hTextAlign="Center">
 				<expression><![CDATA[$F{day}]]></expression>
+				<box>
+					<pen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
 			</element>
 			<element kind="component" uuid="cf3924a9-8a97-4343-88cc-3e91d4262073" x="90" y="0" width="465" height="18">
 				<component kind="list" printOrder="Horizontal">
@@ -46,6 +55,9 @@
 							<expression><![CDATA[
                                 $P{rowValues}.get($F{_THIS})
                             ]]></expression>
+							<box>
+								<pen lineWidth="0.75" lineStyle="Solid"/>
+							</box>
 						</element>
 					</contents>
 				</component>

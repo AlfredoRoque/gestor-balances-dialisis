@@ -23,19 +23,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * Find a user by their username, returns the user if found, otherwise throws an exception.
-     *
-     * @param username The username of the user to be found.
-     * @return The user with the specified username if found, otherwise an exception is thrown.
-     * @throws BalanceGlobalException if the user is not found.
-     */
-    public User findByUsername(String username) {
-        log.info(" user name : {}",username);
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new BalanceGlobalException("User not found",HttpStatus.NOT_FOUND.value()));
-    }
-
-    /**
      * Save a new user in the system, returns the saved user with an encrypted password.
      *
      * @param user The user data to be saved, including username, email, and password.
@@ -50,28 +37,5 @@ public class UserService {
             throw new BalanceGlobalException("Ya existe un usuario con el nombre que intentas registrarte.", HttpStatus.CONFLICT.value());
         }
         return new UserDto(userRepository.save(new User(user,passwordEncoder.encode(user.getPassword()))));
-    }
-
-    /**
-     * Find a user by their email, returns the user if found, otherwise throws an exception.
-     *
-     * @param email The email of the user to be found.
-     * @throws BalanceGlobalException if the user is not found.
-     */
-    public User findByEmail(String email) {
-        log.info(" user mail : {}",email);
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new BalanceGlobalException("Usuario no encontrado",HttpStatus.NOT_FOUND.value()));
-    }
-
-    /**
-     * Update the password of an existing user, returns the updated user with an encrypted password.
-     *
-     * @param user The user data to be updated, including username, email, and new password.
-     */
-    @Transactional
-    public void updatePassword(UserDto user) {
-        log.info(" userName : {}",user.getUsername());
-        new UserDto(userRepository.save(new User(user, passwordEncoder.encode(user.getPassword()))));
     }
 }
