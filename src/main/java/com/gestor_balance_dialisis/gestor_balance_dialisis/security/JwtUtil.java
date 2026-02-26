@@ -27,18 +27,21 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String SECRET;
 
+    @Value("${jwt.expiration}")
+    private long EXPIRATION;
+
     /**
      * Generates a JWT token for the given username.
      *
      * @param username The username for which the token is generated.
-     * @return A JWT token containing the username as the subject, with an expiration time of 30 minutes.
+     * @return A JWT token containing the username as the subject, with an expiration time.
      */
     public String generateToken(String username, User user, String timeZone) {
         return Jwts.builder()
                 .setClaims(SecurityUtils.getUserClaims(user, timeZone))
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // Token expires in 30 minutes
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
