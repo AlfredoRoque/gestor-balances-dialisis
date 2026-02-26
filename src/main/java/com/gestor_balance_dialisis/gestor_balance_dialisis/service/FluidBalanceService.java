@@ -6,6 +6,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.*;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -49,7 +50,10 @@ public class FluidBalanceService {
      */
     public FluidBalanceResponse save(FluidBalanceRequest fluidBalanceRequest) {
         log.info("patientId : {}",fluidBalanceRequest.getPatientId());
-        return new FluidBalanceResponse(fluidBalanceRepository.save(new FluidBalance(fluidBalanceRequest)));
+        if(fluidBalanceRepository.findByDateAndPatientId(fluidBalanceRequest.getDate(), fluidBalanceRequest.getPatientId()).isEmpty()){
+            return new FluidBalanceResponse(fluidBalanceRepository.save(new FluidBalance(fluidBalanceRequest)));
+        }
+        throw new BalanceGlobalException(Constants.FLUID_BALANCE_EXIST, HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -61,7 +65,7 @@ public class FluidBalanceService {
         log.info("fluidBalanceId : {}",fluidBalanceId);
         Optional<FluidBalance> fluidBalanceOptional = fluidBalanceRepository.findById(fluidBalanceId);
         if (fluidBalanceOptional.isEmpty()) {
-            throw new BalanceGlobalException("No existe el balance de fluido: ", HttpStatus.CONFLICT.value());
+            throw new BalanceGlobalException(Constants.FLUID_BALANCE_DOEST_EXIST, HttpStatus.CONFLICT.value());
         }
         FluidBalance updateFluidBalance = new FluidBalance(fluidBalanceRequest);
         updateFluidBalance.setId(fluidBalanceId);
@@ -77,7 +81,7 @@ public class FluidBalanceService {
         log.info("fluidBalanceId: {}",fluidBalanceId);
         Optional<FluidBalance> fluidBalanceOptional = fluidBalanceRepository.findById(fluidBalanceId);
         if (fluidBalanceOptional.isEmpty()) {
-            throw new BalanceGlobalException("No existe el balance de fluido: ", HttpStatus.CONFLICT.value());
+            throw new BalanceGlobalException(Constants.FLUID_BALANCE_DOEST_EXIST, HttpStatus.CONFLICT.value());
         }
         fluidBalanceRepository.deleteById(fluidBalanceId);
     }
@@ -211,7 +215,7 @@ public class FluidBalanceService {
         List<Object> response = new ArrayList<>();
         Optional<Patient> patient = patientRepository.findById(patientId);
         if(patient.isEmpty()){
-            throw new BalanceGlobalException("Error al generar el reporte del paciente: ", HttpStatus.CONFLICT.value());
+            throw new BalanceGlobalException(Constants.GENERATE_REPORT_ERROR, HttpStatus.CONFLICT.value());
         }
         List<CalculateFluidBalanceResponseDto> responseDtoList = this.calculateBalanceFluidForPatient(patientId, startDate, endDate);
         List<PdfFileDto> pdfs = new ArrayList<>();
@@ -223,8 +227,8 @@ public class FluidBalanceService {
                 pdfs.add(new PdfFileDto(patient.get().getName()+"-"+(i+1)+"-a-"+ fin +".pdf",
                         reportService.generateReport(week)));
             } catch (Exception e) {
-                log.error("Error al generar el reporte",e);
-                throw new BalanceGlobalException("Error al generar el reporte: ", HttpStatus.CONFLICT.value());
+                log.error(Constants.GENERATE_REPORT_ERROR,e);
+                throw new BalanceGlobalException(Constants.GENERATE_REPORT_ERROR, HttpStatus.CONFLICT.value());
             }
 
         }

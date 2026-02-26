@@ -19,7 +19,15 @@ import java.util.List;
  * Entity class representing a user in the system.
  */
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios",
+        indexes = {
+                @Index(name = "idx_user_id_usuario", columnList = "id_usuario"),
+                @Index(name = "idx_user_nombre_usuario", columnList = "nombre_usuario"),
+                @Index(name = "idx_user_fecha_creacion", columnList = "fecha_creacion"),
+                @Index(name = "idx_user_estatus", columnList = "estatus"),
+                @Index(name = "idx_user_rol", columnList = "rol"),
+                @Index(name = "idx_user_correo", columnList = "correo")
+        })
 @Getter
 @Setter
 @AllArgsConstructor

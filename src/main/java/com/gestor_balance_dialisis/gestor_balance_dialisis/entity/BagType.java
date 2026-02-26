@@ -12,7 +12,11 @@ import lombok.Setter;
  * This class is used to store information about different types of bags used in dialysis.
  */
 @Entity
-@Table(name = "tipo_bolsa")
+@Table(name = "tipo_bolsa",
+        indexes = {
+                @Index(name = "idx_bag_type_id_tipo_bolsa", columnList = "id_tipo_bolsa"),
+                @Index(name = "idx_bag_type_tipo", columnList = "tipo")
+})
 @Getter
 @Setter
 @AllArgsConstructor

@@ -18,7 +18,12 @@ import java.util.Date;
  * This class is used to store information about extra fluids for a patient, including urine and ingested fluids.
  */
 @Entity
-@Table(name = "liquido_extra")
+@Table(name = "liquido_extra",
+        indexes = {
+                @Index(name = "idx_extra_fluid_id_liquido_extra", columnList = "id_liquido_extra"),
+                @Index(name = "idx_extra_fluid_id_paciente", columnList = "id_paciente"),
+                @Index(name = "idx_extra_fluid_fecha", columnList = "fecha")
+        })
 @Getter
 @Setter
 @AllArgsConstructor

@@ -4,6 +4,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.UserSessionModel;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.UserRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -68,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 Optional<User> user = userRepository.findById(sessionModel.getUserId().longValue());
                 user.orElseThrow(() -> new BalanceGlobalException("User not found", HttpStatus.NOT_FOUND.value()));
                 if (sessionModel.getTokenVersion() != user.get().getTokenVersion().intValue()) {
-                    throw new BalanceGlobalException("Invalid token", HttpStatus.UNAUTHORIZED.value());
+                    throw new BalanceGlobalException(Constants.INVALID_TOKEN, HttpStatus.UNAUTHORIZED.value());
                 }
 
                 if (sessionModel.getUsername() != null && !sessionModel.getUsername().isEmpty()) {

@@ -63,4 +63,18 @@ public class Utility {
                 .atZone(zone)
                 .toInstant();
     }
+
+    /**
+     * Checks if two Instants fall on the same calendar day in the specified time zone.
+     *
+     * @param i1   The first Instant to compare.
+     * @param i2   The second Instant to compare.
+     * @param zone The time zone to use for the comparison.
+     * @return true if both Instants fall on the same calendar day in the specified time zone, false otherwise.
+     */
+    public static boolean isSameDay(Instant i1, Instant i2, ZoneId zone) {
+        LocalDate d1 = i1.atZone(zone).toLocalDate();
+        LocalDate d2 = i2.atZone(zone).toLocalDate();
+        return d1.equals(d2);
+    }
 }

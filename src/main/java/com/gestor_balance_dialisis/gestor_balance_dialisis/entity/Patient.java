@@ -20,7 +20,13 @@ import java.util.Objects;
  * This class is mapped to the "paciente" table in the database.
  */
 @Entity
-@Table(name = "paciente")
+@Table(name = "paciente",
+        indexes = {
+                @Index(name = "idx_patient_id_paciente", columnList = "id_paciente"),
+                @Index(name = "idx_patient_nombre", columnList = "nombre"),
+                @Index(name = "idx_patient_id_usuario", columnList = "id_usuario"),
+                @Index(name = "idx_patient_estatus", columnList = "estatus")
+        })
 @Getter
 @Setter
 @AllArgsConstructor

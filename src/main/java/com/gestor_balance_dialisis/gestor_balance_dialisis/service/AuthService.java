@@ -6,6 +6,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlob
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.UserRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.security.JwtUtil;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.security.RsaKeyService;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.mail.MessagingException;
@@ -43,12 +44,12 @@ public class AuthService {
     public JwtResponse login(LoginRequest request) {
         log.info("for user: {}",request.getUsername());
         Optional<User> user = userRepository.findByUsername(request.getUsername());
-        user.orElseThrow(() -> new BalanceGlobalException("User not found", HttpStatus.NOT_FOUND.value()));
+        user.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
 
         String rawPassword = SecurityUtils.decryptPassword(request.getPassword(),rsaKeyService);
 
         if (!passwordEncoder.matches(rawPassword, user.get().getPassword())) {
-            throw new BalanceGlobalException("Invalid credentials", HttpStatus.CONFLICT.value());
+            throw new BalanceGlobalException(Constants.INVALID_CREDENTIALS, HttpStatus.CONFLICT.value());
         }
         user.get().setTokenVersion(Long.parseLong(String.valueOf(ThreadLocalRandom.current().nextInt(1, 10_000_001))));
         userRepository.save(user.get());
@@ -63,7 +64,7 @@ public class AuthService {
      */
     public void validateMail(String email) {
         log.info("for : {}",email);
-        userRepository.findByEmail(email).orElseThrow(() -> new BalanceGlobalException("Invalid credentials", HttpStatus.NOT_FOUND.value()));;
+        userRepository.findByEmail(email).orElseThrow(() -> new BalanceGlobalException(Constants.INVALID_CREDENTIALS, HttpStatus.NOT_FOUND.value()));;
     }
 
     /**
@@ -79,13 +80,13 @@ public class AuthService {
     public void recoverPassword(String email) throws MessagingException {
         log.info("for {}: ",email);
         Optional<User> user = userRepository.findByEmail(email);
-        user.orElseThrow(() -> new BalanceGlobalException("User not found", HttpStatus.NOT_FOUND.value()));
+        user.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
         String temporaryPassword = Utility.generateTemporaryPassword(10);
         try {
             user.get().setPassword(passwordEncoder.encode(temporaryPassword));
             userRepository.save(user.get());
         }catch (Exception e){
-            throw new BalanceGlobalException("Error for recover password", HttpStatus.CONFLICT.value());
+            throw new BalanceGlobalException(Constants.ERROR_RECOVERING_PASSWORD, HttpStatus.CONFLICT.value());
         }
         //create and send email to user with temporary password
         mailService.sendMailToRecoverPassword(user.get(),temporaryPassword);
@@ -98,7 +99,7 @@ public class AuthService {
      */
     public void logout() {
         Optional<User> user = userRepository.findById(SecurityUtils.getUserId());
-        user.orElseThrow(() -> new BalanceGlobalException("User not found", HttpStatus.NOT_FOUND.value()));
+        user.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
         // Increment the token version to invalidate existing tokens
         user.get().setTokenVersion(user.get().getTokenVersion() + 1);
         userRepository.save(user.get());

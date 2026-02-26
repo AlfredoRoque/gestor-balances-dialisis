@@ -19,7 +19,12 @@ import java.util.Date;
  * This class is mapped to the "balance_liquido" table in the database.
  */
 @Entity
-@Table(name = "balance_liquido")
+@Table(name = "balance_liquido",
+        indexes = {
+                @Index(name = "idx_fluid_balance_id_balence_liquido", columnList = "id_balence_liquido"),
+                @Index(name = "idx_fluid_balance_id_paciente", columnList = "id_paciente"),
+                @Index(name = "idx_fluid_balance_fecha", columnList = "fecha")
+        })
 @Getter
 @Setter
 @AllArgsConstructor
