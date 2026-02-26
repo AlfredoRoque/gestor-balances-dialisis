@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.gestor-balance-dialisis</groupId>
 	<artifactId>gestor-balance-dialisis</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>gestor-balance-dialisis</name>
 	<description>gestor de balance dialisis</description>
 	<url/>
