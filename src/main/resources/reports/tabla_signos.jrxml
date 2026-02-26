@@ -1,0 +1,67 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="tabla_signos" language="java" pageWidth="555" pageHeight="220" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="370b1b69-f91d-4b64-9fab-3cf183d291f5">
+	<dataset name="ColumnDataset" uuid="bd2f4dc2-1144-4c36-89f7-8e4ac461d527">
+		<parameter name="rowValues" class="java.util.Map"/>
+		<field name="_THIS" class="java.lang.String"/>
+	</dataset>
+	<parameter name="COLUMNS" class="java.util.List"/>
+	<field name="day" class="java.lang.String"/>
+	<field name="values" class="java.util.Map"/>
+	<columnHeader height="20">
+		<element kind="staticText" uuid="089ffaf4-33ba-4f0d-b06c-36655b189cab" x="0" y="0" width="90" height="20" fontSize="8.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[Fecha]]></text>
+			<box>
+				<pen lineWidth="0.75" lineStyle="Solid"/>
+			</box>
+		</element>
+		<element kind="component" uuid="b42cde57-35c3-4ad7-944a-465d0a9ff4e4" x="90" y="0" width="465" height="20">
+			<component kind="list" printOrder="Horizontal">
+				<datasetRun uuid="22ef2c5f-9c33-4595-838a-8d5e91184aa9" subDataset="ColumnDataset">
+					<dataSourceExpression><![CDATA[
+                        new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{COLUMNS})
+                    ]]></dataSourceExpression>
+				</datasetRun>
+				<contents height="20" width="90">
+					<element kind="textField" uuid="fc56d300-e4cd-4dc6-a7bc-adf8c299caed" x="0" y="0" width="90" height="20" fontSize="8.0" bold="true" hTextAlign="Center">
+						<expression><![CDATA[$F{_THIS}]]></expression>
+						<box>
+							<pen lineWidth="0.75" lineStyle="Solid"/>
+						</box>
+					</element>
+				</contents>
+			</component>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="18">
+			<element kind="textField" uuid="dc259644-7747-41ab-b443-b1f901a8d738" x="0" y="0" width="90" height="18" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{day}]]></expression>
+				<box>
+					<pen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="component" uuid="cf3924a9-8a97-4343-88cc-3e91d4262073" x="90" y="0" width="465" height="18">
+				<component kind="list" printOrder="Horizontal">
+					<datasetRun uuid="25da8d6c-5826-4637-82cf-8c3e3d74a201" subDataset="ColumnDataset">
+						<dataSourceExpression><![CDATA[
+                            new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{COLUMNS})
+                        ]]></dataSourceExpression>
+						<parameter name="rowValues">
+							<expression><![CDATA[$F{values}]]></expression>
+						</parameter>
+					</datasetRun>
+					<contents height="18" width="90">
+						<element kind="textField" uuid="0f09b1ca-aa19-4524-ab3c-a13b6f9006a1" x="0" y="0" width="90" height="18" fontSize="8.0" hTextAlign="Center">
+							<expression><![CDATA[
+                                $P{rowValues}.get($F{_THIS})
+                            ]]></expression>
+							<box>
+								<pen lineWidth="0.75" lineStyle="Solid"/>
+							</box>
+						</element>
+					</contents>
+				</component>
+			</element>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,42 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="Dialisis_main" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="11111111-1111-1111-1111-111111111111">
+	<parameter name="BALANCES" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="VITAL_SIGNS" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="MEDICINES" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
+	<parameter name="COLUMNS" class="java.util.List"/>
+	<title height="80">
+		<element kind="staticText" uuid="cee6c0a7-093c-4dfd-81aa-d96fcb018e43" x="0" y="0" width="555" height="20" fontSize="13.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[GOBIERNO DE MÉXICO / IMSS BIENESTAR]]></text>
+		</element>
+		<element kind="staticText" uuid="6e465fbb-0c59-4a71-a04c-1262e0f14d9f" x="0" y="30" width="555" height="20" fontSize="10.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[REGISTRO DIÁLISIS PERITONEAL]]></text>
+		</element>
+	</title>
+	<detail>
+		<band height="430" splitType="Stretch">
+			<element kind="subreport" uuid="1ae87ecc-3a6a-4818-8bcc-f492982751d6" positionType="Float" x="0" y="-30" width="555" height="460">
+				<dataSourceExpression><![CDATA[$P{BALANCES}]]></dataSourceExpression>
+				<expression><![CDATA[$P{SUBREPORT_DIR} + "sub_tabla_dialisis.jasper"]]></expression>
+			</element>
+		</band>
+	</detail>
+	<summary height="250" splitType="Prevent">
+		<element kind="subreport" uuid="447567d9-fa97-4725-9866-8522042b63a5" x="0" y="10" width="555" height="235">
+			<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.JREmptyDataSource()]]></dataSourceExpression>
+			<expression><![CDATA[$P{SUBREPORT_DIR} + "tabla_wraper.jasper"]]></expression>
+			<parameter name="SUBREPORT_DIR">
+				<expression><![CDATA[$P{SUBREPORT_DIR}]]></expression>
+			</parameter>
+			<parameter name="VITAL_SIGNS">
+				<expression><![CDATA[$P{VITAL_SIGNS}]]></expression>
+			</parameter>
+			<parameter name="MEDICINES">
+				<expression><![CDATA[$P{MEDICINES}]]></expression>
+			</parameter>
+			<parameter name="COLUMNS">
+				<expression><![CDATA[$P{COLUMNS}]]></expression>
+			</parameter>
+		</element>
+	</summary>
+</jasperReport>

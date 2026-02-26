@@ -1,0 +1,353 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="sub_tabla_dialisis" language="java" pageWidth="555" pageHeight="842" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="33333333-3333-3333-3333-333333333333">
+	<field name="changeNumber" class="java.lang.Integer"/>
+	<field name="day" class="java.lang.String"/>
+	<field name="patient" class="com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PatientResponse"/>
+	<field name="drained" class="java.math.BigDecimal"/>
+	<field name="infused" class="java.math.BigDecimal"/>
+	<field name="ultrafiltration" class="java.math.BigDecimal"/>
+	<field name="totalUrine" class="java.math.BigDecimal"/>
+	<field name="descriptionFluid" class="java.lang.String"/>
+	<field name="partialBalance" class="java.math.BigDecimal"/>
+	<field name="totalBalance" class="java.math.BigDecimal"/>
+	<field name="totalIngested" class="java.math.BigDecimal"/>
+	<field name="hour" class="java.lang.String"/>
+	<variable name="CONTADOR" calculation="Count" class="java.lang.Integer">
+		<expression><![CDATA[$F{changeNumber}]]></expression>
+	</variable>
+	<variable name="FIRST_TOTAL_INGESTED" resetType="Group" calculation="First" resetGroup="GRP_BLOQUE" class="java.math.BigDecimal">
+		<expression><![CDATA[$F{totalIngested}]]></expression>
+	</variable>
+	<group name="GRP_BLOQUE">
+		<expression><![CDATA[($V{REPORT_COUNT}-1)/5]]></expression>
+		<groupHeader>
+			<band height="43">
+				<element kind="staticText" uuid="5022d94e-b31b-4f68-a9fa-58b3c8c46836" x="-1" y="11" width="50" height="22" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[N. Cambio]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="7b3ff37d-f737-4bd1-bf45-b1f2c19a743c" x="49" y="11" width="40" height="22" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Hora]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="6c30fba6-1cbe-4ecc-af5d-6f03fb4f274c" x="90" y="11" width="48" height="22" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Tipo bolsa]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="cbe619a1-8cde-4b89-9a48-fe5b32973027" x="139" y="11" width="54" height="22" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Drenado]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="81910b71-b700-4404-8794-804a2bbba671" x="194" y="11" width="65" height="22" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Infundido]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="8db6799f-9f80-4126-b1d3-61b22ab17c0f" x="259" y="11" width="75" height="22" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Ultrafiltración]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="cf590a43-6243-47c8-8c62-fbfe58127d69" x="334" y="11" width="70" height="22" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Orina 24h]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="4f3ba766-2375-4a17-90cc-a38f8d6dc479" x="404" y="11" width="85" height="22" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Características]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="6f30996c-27fa-4170-9948-56219f07d35b" x="489" y="11" width="65" height="22" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Liquido ingerido
+en 24h]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="50">
+				<element kind="staticText" uuid="a9d2c7f2-d53b-4afa-81e6-6ee3536395b2" x="-1" y="-15" width="555" height="37" fontSize="8.0" bold="true" hTextAlign="Right">
+					<text><![CDATA[]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="e5a5a59e-3487-4caa-8c2a-b0c4bf1bacf5" x="-1" y="-15" width="50" height="20" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Fecha]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="f1dcd2de-70fa-4155-92fd-3193ff9798b7" x="-1" y="5" width="50" height="17" fontSize="8.0" hTextAlign="Center">
+					<expression><![CDATA[$F{day}]]></expression>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="8ede23ea-12c9-4309-9ab0-65cfbe4f0ac5" x="50" y="-15" width="208" height="20" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Balance Parcial]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="f0138a62-52f3-4c5d-8ce7-6a192eaebf82" x="50" y="5" width="208" height="17" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Balance Total(suma de la ultrafultracion mas la orina)]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="166e4850-4694-4780-b62a-5261bd3992da" x="259" y="-14" width="75" height="18" fontSize="8.0" hTextAlign="Center">
+					<expression><![CDATA[$F{partialBalance}]]></expression>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="892ced9f-ef27-4d61-ad41-9fc002917560" x="259" y="5" width="145" height="17" fontSize="8.0" hTextAlign="Center">
+					<expression><![CDATA[$F{totalBalance}]]></expression>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="255c3acb-967e-46b4-8e78-d8b0fd14ac19" x="334" y="-14" width="70" height="18" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[-]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="f20489f4-74d3-4254-bca1-32fb6028e5a0" x="404" y="-15" width="85" height="19" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[-]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="e0056cde-b4e3-4e89-af3b-77508c88b37d" x="404" y="5" width="85" height="17" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[Total liquido ingerido]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="staticText" uuid="4b778c43-a737-465c-8f48-28c039eb9779" x="489" y="-15" width="65" height="19" fontSize="8.0" bold="true" hTextAlign="Center">
+					<text><![CDATA[-]]></text>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+				<element kind="textField" uuid="fb49f240-4784-476a-b417-03d5d154e47d" x="489" y="4" width="65" height="18" fontSize="8.0" hTextAlign="Center">
+					<expression><![CDATA[$V{FIRST_TOTAL_INGESTED}]]></expression>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+				</element>
+			</band>
+		</groupFooter>
+	</group>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<element kind="textField" uuid="aa396486-2480-4252-bdd6-5504e5b774dd" x="-1" y="-10" width="50" height="14" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{changeNumber}]]></expression>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="949427c2-821f-4a93-85f5-e31db12dcf54" x="49" y="-10" width="40" height="14" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{hour}]]></expression>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="42f84fa7-1777-4897-ad44-7fb9c25ec3be" x="90" y="-10" width="48" height="14" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{patient}.getBagType().getType()]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="5f2e3c0e-01cb-4748-bd3d-505970626133" x="139" y="-10" width="55" height="14" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{drained}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="a0e28d94-82e1-40f0-9c38-a95ee56ff708" x="194" y="-10" width="65" height="14" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{infused}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="82ad6e8f-d3f6-493e-99c6-d579b8b19439" x="259" y="-10" width="75" height="14" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{ultrafiltration}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="4016de06-51da-4ef9-8b57-4a0549796f93" x="334" y="-10" width="70" height="14" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{totalUrine}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="78ff2283-6adc-4332-b0c2-85924af34ccf" x="404" y="-10" width="85" height="14" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{descriptionFluid}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="5e54a52d-b064-49e5-8e77-8b6ff4c7dc12" x="489" y="-10" width="65" height="14" fontSize="8.0" hTextAlign="Center">
+				<expression><![CDATA[$F{totalIngested}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</element>
+			<property name="com.jaspersoft.studio.layout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</detail>
+</jasperReport>
