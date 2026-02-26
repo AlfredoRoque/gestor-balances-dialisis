@@ -1,6 +1,7 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.service;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.*;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +35,11 @@ public class ReportService {
      */
     public byte[] generateReport(List<CalculateFluidBalanceResponseDto> fluidBalanceResponse) throws Exception {
         log.info(" balances size : {}",fluidBalanceResponse.size());
-        InputStream mainStream = new ClassPathResource("/reports/Dialisis_main.jasper").getInputStream();
+        InputStream mainStream = new ClassPathResource(Constants.PATH_MAIN_REPORT).getInputStream();
 
         Map<String, Object> params = new HashMap<>();
         params.put("SUBREPORT_DIR",
-                new ClassPathResource("/reports/").getURL().toString()
+                new ClassPathResource(Constants.PATH_REPORTS).getURL().toString()
         );
 
         DateTimeFormatter formatterHour = DateTimeFormatter.ofPattern("HH:mm");

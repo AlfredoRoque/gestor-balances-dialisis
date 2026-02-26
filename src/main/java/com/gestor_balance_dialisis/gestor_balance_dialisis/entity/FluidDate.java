@@ -14,7 +14,11 @@ import java.time.Instant;
  * This class is mapped to the "balance_liquido_fecha" table in the database.
  */
 @Entity
-@Table(name = "balance_liquido_fecha")
+@Table(name = "balance_liquido_fecha",
+        indexes = {
+                @Index(name = "idx_fluid_date_id_balence_liquido_fecha", columnList = "id_balance_liquido_fecha"),
+                @Index(name = "idx_fluid_date_fecha", columnList = "fecha")
+        })
 @Getter
 @Setter
 @AllArgsConstructor

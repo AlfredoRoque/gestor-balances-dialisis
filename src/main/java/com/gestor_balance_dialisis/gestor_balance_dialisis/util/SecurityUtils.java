@@ -88,7 +88,7 @@ public class SecurityUtils {
             rawPassword = rsaKeyService.decrypt(encryptedPassword);
         } catch (Exception e) {
             log.warn("Password decryption failed {}", e.getMessage());
-            throw new BalanceGlobalException("Invalid credentials", HttpStatus.CONFLICT.value());
+            throw new BalanceGlobalException(Constants.INVALID_CREDENTIALS, HttpStatus.CONFLICT.value());
         }
         return rawPassword;
     }

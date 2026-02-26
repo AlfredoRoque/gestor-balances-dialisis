@@ -7,6 +7,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.MedicineDetailRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.MedicineRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -80,7 +81,7 @@ public class MedicineService {
             return new MedicineDetailResponseDto(medicineDetailRepository.save(new MedicineDetail(
                     medicineDetail.get(), medicineDetailUpdateRequestDto, Instant.now().atZone(zone).toInstant())));
         }
-        throw new BalanceGlobalException("Medicine detail doesn't exist", HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.MEDICINE_DETAIL_NOT_FOUND, HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -97,7 +98,7 @@ public class MedicineService {
             medicineDetailRepository.deleteById(medicineId);
             return;
         }
-        throw new BalanceGlobalException("Medicine detail doesn't exist", HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.MEDICINE_DETAIL_NOT_FOUND, HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -128,7 +129,7 @@ public class MedicineService {
             medicineRequest.setId(medicineId);
             return new MedicineResponse(medicineRepository.save(new Medicine(medicineRequest)));
         }
-        throw new BalanceGlobalException("Medicine doesn't exist", HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.MEDICINE_NOT_FOUND, HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -145,6 +146,6 @@ public class MedicineService {
             medicineRepository.deleteById(medicineId);
             return;
         }
-        throw new BalanceGlobalException("Medicine doesn't exist", HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.MEDICINE_NOT_FOUND, HttpStatus.CONFLICT.value());
     }
 }

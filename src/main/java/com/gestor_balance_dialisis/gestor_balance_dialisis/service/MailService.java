@@ -6,6 +6,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.MailTemplateRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.PatientRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.TEMPLATE_ENUM;
 import jakarta.mail.MessagingException;
@@ -114,6 +115,6 @@ public class MailService {
             mailSender.send(message);
             return;
         }
-        throw new BalanceGlobalException("Patient with ID was not found: " + patientId, HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.PATIENT_NOT_FOUND + patientId, HttpStatus.CONFLICT.value());
     }
 }

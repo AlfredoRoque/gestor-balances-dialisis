@@ -11,7 +11,11 @@ import lombok.Setter;
  * It contains fields for the template's ID, name, and content. The content field is defined as TEXT to allow for longer templates.
  */
 @Entity
-@Table(name = "plantilla_correo")
+@Table(name = "plantilla_correo",
+        indexes = {
+                @Index(name = "idx_mail_template_id_plantilla_correo", columnList = "id_plantilla_correo"),
+                @Index(name = "idx_mail_template_nombre", columnList = "nombre")
+        })
 @Getter
 @Setter
 @AllArgsConstructor

@@ -16,7 +16,14 @@ import java.time.Instant;
  * This class is mapped to the "detalle_medicina" table in the database.
  */
 @Entity
-@Table(name = "detalle_medicina")
+@Table(name = "detalle_medicina",
+        indexes = {
+                @Index(name = "idx_medicine_detail_id_detalle_medicina", columnList = "id_detalle_medicina"),
+                @Index(name = "idx_medicine_detail_id_paciente", columnList = "id_paciente"),
+                @Index(name = "idx_medicine_detail_fecha_inicio_toma", columnList = "fecha_inicio_toma"),
+                @Index(name = "idx_medicine_detail_id_medicina", columnList = "id_medicina"),
+                @Index(name = "idx_medicine_detail_estatus", columnList = "estatus")
+        })
 @Getter
 @Setter
 @AllArgsConstructor

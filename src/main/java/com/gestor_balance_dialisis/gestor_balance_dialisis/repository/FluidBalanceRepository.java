@@ -18,4 +18,5 @@ public interface FluidBalanceRepository extends JpaRepository<FluidBalance, Long
 
     List<FluidBalance> getFluidBalancesByDateBetweenAndPatientIdOrderByDateAsc(Instant dateAfter, Instant dateBefore, Long patientId);
 
+    List<FluidBalance> findByDateAndPatientId(Instant date, Long patientId);
 }

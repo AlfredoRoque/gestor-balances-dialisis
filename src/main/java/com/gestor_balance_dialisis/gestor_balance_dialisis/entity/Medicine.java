@@ -13,7 +13,11 @@ import lombok.Setter;
  * Entity class representing a medicine in the system.
  */
 @Entity
-@Table(name = "medicina")
+@Table(name = "medicina",
+        indexes = {
+                @Index(name = "idx_medicine_id_medicina", columnList = "id_medicina"),
+                @Index(name = "idx_medicine_id_usuario", columnList = "id_usuario")
+        })
 @Getter
 @Setter
 @AllArgsConstructor

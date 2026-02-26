@@ -5,6 +5,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.ExtraFluidRespons
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.ExtraFluid;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.ExtraFluidRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -87,7 +88,7 @@ public class ExtraFluidService {
             extraFluidRequestDto.setId(extraFluidId);
             return new ExtraFluidResponseDto(extraFluidRepository.save(new ExtraFluid(extraFluidRequestDto)));
         }
-        throw new BalanceGlobalException("Extra fluid record not found for update with id: " + extraFluidId, HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(String.format(Constants.EXTRA_FLUID_NOT_FOUND, extraFluidId), HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -102,6 +103,6 @@ public class ExtraFluidService {
             extraFluidRepository.deleteById(extraFluidId);
             return;
         }
-        throw new BalanceGlobalException("Extra fluid record not found for delete with id: " + extraFluidId, HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(String.format(Constants.EXTRA_FLUID_NOT_FOUND, extraFluidId), HttpStatus.CONFLICT.value());
     }
 }

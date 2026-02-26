@@ -5,6 +5,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.UserRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.security.RsaKeyService;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +38,9 @@ public class UserService {
     public UserDto save(UserDto user) {
         log.info("user name : {}",user.getUsername());
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new BalanceGlobalException("Ya existe un usuario asignado al correo con el que intentas registrarte.", HttpStatus.CONFLICT.value());
+            throw new BalanceGlobalException(Constants.EMAIL_USER_EXIST, HttpStatus.CONFLICT.value());
         } else if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new BalanceGlobalException("Ya existe un usuario con el nombre que intentas registrarte.", HttpStatus.CONFLICT.value());
+            throw new BalanceGlobalException(Constants.USER_NAME_EXIST, HttpStatus.CONFLICT.value());
         }
         String rawPassword = SecurityUtils.decryptPassword(user.getPassword(),rsaKeyService);
         return new UserDto(userRepository.save(new User(user,passwordEncoder.encode(rawPassword))));
@@ -59,7 +60,7 @@ public class UserService {
         if (user.isPresent()) {
             String actualRawPassword = SecurityUtils.decryptPassword(actualPassword,rsaKeyService);
             if (!passwordEncoder.matches(actualRawPassword, user.get().getPassword())) {
-                throw new BalanceGlobalException("Invalid credentials", HttpStatus.CONFLICT.value());
+                throw new BalanceGlobalException(Constants.INVALID_CREDENTIALS, HttpStatus.CONFLICT.value());
             }
             String newRawPassword = SecurityUtils.decryptPassword(newPassword,rsaKeyService);
             User userSave = new User(new UserDto(user.get()),passwordEncoder.encode(newRawPassword));
@@ -69,6 +70,6 @@ public class UserService {
             userRepository.save(userSave);
             return;
         }
-        throw new BalanceGlobalException("Failed to update credentials", HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.UPDATE_ERROR_CREDENTIALS, HttpStatus.CONFLICT.value());
     }
 }

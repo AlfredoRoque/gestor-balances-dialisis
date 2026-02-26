@@ -14,7 +14,11 @@ import lombok.Setter;
  * This class is mapped to the "signo_vital" table in the database.
  */
 @Entity
-@Table(name = "signo_vital")
+@Table(name = "signo_vital",
+        indexes = {
+                @Index(name = "idx_vital_sign_id_signo_vital", columnList = "id_signo_vital"),
+                @Index(name = "idx_vital_sign_id_usuario", columnList = "id_usuario")
+        })
 @Getter
 @Setter
 @AllArgsConstructor

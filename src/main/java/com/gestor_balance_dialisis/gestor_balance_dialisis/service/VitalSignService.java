@@ -7,6 +7,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.VitalSignDetailRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.VitalSignRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.transaction.Transactional;
@@ -61,6 +62,7 @@ public class VitalSignService {
     @Transactional
     public VitalSignDetailResponse saveVitalSignDetail(VitalSignDetailRequest vitalSignDetailRequest) {
         log.info(" vitalSignName : {}",vitalSignDetailRequest.getVitalSign().getName());
+        vitalSignDetailRequest.setDate(Utility.startDay(vitalSignDetailRequest.getDate()));
         return new VitalSignDetailResponse(vitalSignDetailRepository.save(new VitalSignDetail(vitalSignDetailRequest)));
     }
 
@@ -78,7 +80,7 @@ public class VitalSignService {
         if(vitalSignDetail.isPresent()){
             return new VitalSignDetailResponse(vitalSignDetailRepository.save(new VitalSignDetail(vitalSignDetail.get(), vitalSignDetailUpdateRequest)));
         }
-        throw new BalanceGlobalException("Vital sign detail doesn't exist", HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.VITAL_SIGN_DETAIL_NOT_FOUND, HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -95,7 +97,7 @@ public class VitalSignService {
             vitalSignDetailRepository.deleteById(vitalSignDetailId);
             return;
         }
-        throw new BalanceGlobalException("Vital sign detail doesn't exist", HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.VITAL_SIGN_DETAIL_NOT_FOUND, HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -142,7 +144,7 @@ public class VitalSignService {
             vitalSignRequest.setId(vitalSignId);
             return new VitalSignResponse(vitalSignRepository.save(new VitalSign(vitalSignRequest)));
         }
-        throw new BalanceGlobalException("Vital sign detail doesn't exist", HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.VITAL_SIGN_DETAIL_NOT_FOUND, HttpStatus.CONFLICT.value());
     }
 
     /**
@@ -159,6 +161,6 @@ public class VitalSignService {
             vitalSignRepository.deleteById(vitalSignId);
             return;
         }
-        throw new BalanceGlobalException("Vital sign detail doesn't exist", HttpStatus.CONFLICT.value());
+        throw new BalanceGlobalException(Constants.VITAL_SIGN_DETAIL_NOT_FOUND, HttpStatus.CONFLICT.value());
     }
 }

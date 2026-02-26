@@ -17,7 +17,14 @@ import java.util.Objects;
  * This class is mapped to the "detalle_signo_vital" table in the database.
  */
 @Entity
-@Table(name = "detalle_signo_vital")
+@Table(name = "detalle_signo_vital",
+        indexes = {
+                @Index(name = "idx_vital_sign_detail_id_detalle_signo_vital", columnList = "id_detalle_signo_vital"),
+                @Index(name = "idx_vital_sign_detail_id_paciente", columnList = "id_paciente"),
+                @Index(name = "idx_vital_sign_detail_fecha", columnList = "fecha"),
+                @Index(name = "idx_vital_sign_detail_id_signo_vital", columnList = "id_signo_vital"),
+                @Index(name = "idx_vital_sign_detail_estatus", columnList = "estatus")
+        })
 @Getter
 @Setter
 @AllArgsConstructor
