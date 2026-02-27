@@ -13,6 +13,8 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,14 +22,11 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * Service for sending emails to users, specifically for password recovery purposes.
@@ -43,6 +42,9 @@ public class MailService {
     private final PatientRepository patientRepository;
     private final MailTemplateRepository mailTemplateRepository;
 
+    @Value("${app.mail.from}")
+    private String fromEmail;
+
     /**
      * Email the user with a temporary password for password recovery.
      *
@@ -53,23 +55,11 @@ public class MailService {
     public void sendMailToRecoverPassword(User user, String temporaryPassword) throws MessagingException {
         log.info(" for user: {}",user.getUsername());
 
-        MailTemplate template = mailTemplateRepository
-                .findByName(TEMPLATE_ENUM.TEMPLATE_RECOVER_PASSWORD.getValue());
-
         Context context = new Context();
         context.setVariable("userName", user.getUsername());
         context.setVariable("password", temporaryPassword);
 
-        String htmlContent = templateEngine.process(template.getContent(), context);
-
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-        helper.setTo(user.getEmail());
-        helper.setSubject("Recuperar contraseña 🚀");
-        helper.setText(htmlContent, true);
-
-        mailSender.send(message);
+        this.sendMail(TEMPLATE_ENUM.TEMPLATE_RECOVER_PASSWORD.getValue(),context,user.getEmail(),"Recuperar contraseña 🚀",null,null);
     }
 
     /**
@@ -80,41 +70,63 @@ public class MailService {
      * @param startDate The start date of the balance report.
      * @param endDate   The end date of the balance report.
      * @throws MessagingException if there is an error while sending the email.
-     * @throws IOException        if there is an error while creating or writing to the temporary file for the PDF attachment.
      */
-    public void sendBalancesMailToUserMail(List<Object> response, Long patientId, Instant startDate, Instant endDate) throws MessagingException, IOException {
-        log.info(" patientId : {}",patientId);
-        Optional<Patient> patient = patientRepository.findById(patientId);
-        if(patient.isPresent()) {
-            MailTemplate template = mailTemplateRepository
-                    .findByName(TEMPLATE_ENUM.TEMPLATE_BALANCE_REPORT.getValue());
+    public void sendBalancesMailToUserMail(List<Object> response, Long patientId,
+                                           Instant startDate, Instant endDate) throws MessagingException {
 
-            Context context = new Context();
-            context.setVariable("userName", patient.get().getUser().getUsername());
-            context.setVariable("patientName", patient.get().getName());
+        log.info("Sending balance mail for patientId: {}", patientId);
 
-            String htmlContent = templateEngine.process(template.getContent(), context);
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() ->
+                        new BalanceGlobalException(
+                                Constants.PATIENT_NOT_FOUND + patientId,
+                                HttpStatus.CONFLICT.value()));
 
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        Context context = new Context();
+        context.setVariable("userName", patient.getUser().getUsername());
+        context.setVariable("patientName", patient.getName());
 
-            DateTimeFormatter formatterDay = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            helper.setTo(patient.get().getUser().getEmail());
-            ZoneId zone = SecurityUtils.getUserZone();
-            helper.setSubject("Balance de "+patient.get().getName() + " de " + startDate.atZone(zone)
-                    .format(formatterDay) + " a " + endDate.atZone(zone).format(formatterDay) + " 🚀");
-            helper.setText(htmlContent, true);
-            File tempFile = File.createTempFile("reporte_", ".pdf");
-            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                fos.write((byte[]) response.get(0));
-            } catch (IOException e) {
-                log.error("Error writing the temporary file: {}", String.valueOf(e));
-            }
-            helper.addAttachment((String) response.get(2),tempFile);
+        ZoneId zone = SecurityUtils.getUserZone();
+        DateTimeFormatter formatterDay = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-            mailSender.send(message);
-            return;
+        this.sendMail(TEMPLATE_ENUM.TEMPLATE_BALANCE_REPORT.getValue(),context,patient.getUser().getEmail(),
+                String.format(
+                "Balance de %s de %s a %s 🚀",
+                patient.getName(),
+                startDate.atZone(zone).format(formatterDay),
+                endDate.atZone(zone).format(formatterDay)),(byte[]) response.get(0),(String) response.get(2));
+    }
+
+    /**
+     * Helper method to send an email with the specified template, context, recipient email, subject, and optional PDF attachment.
+     *
+     * @param templateName The name of the email template to use for generating the email content.
+     * @param context      The Thymeleaf context containing variables to be replaced in the email template.
+     * @param email        The recipient's email address.
+     * @param subject      The subject of the email.
+     * @param pdfBytes     Optional byte array of a PDF file to be attached to the email. Can be null if no attachment is needed.
+     * @param fileName     The name of the PDF file to be attached. Required if pdfBytes is not null.
+     * @throws MessagingException if there is an error while sending the email.
+     */
+    private void sendMail(String templateName, Context context, String email,String subject,byte[] pdfBytes,String fileName) throws MessagingException {
+        MailTemplate template = mailTemplateRepository
+                .findByName(templateName);
+
+        String htmlContent = templateEngine.process(template.getContent(), context);
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        helper.setFrom(fromEmail);
+        helper.setTo(email);
+        helper.setSubject(subject);
+        helper.setText(htmlContent, true);
+        if(Objects.nonNull(pdfBytes)) {
+            helper.addAttachment(
+                    fileName,
+                    new ByteArrayResource(pdfBytes));
         }
-        throw new BalanceGlobalException(Constants.PATIENT_NOT_FOUND + patientId, HttpStatus.CONFLICT.value());
+        mailSender.send(message);
+        log.info("Successful send mail {}", email);
     }
 }
