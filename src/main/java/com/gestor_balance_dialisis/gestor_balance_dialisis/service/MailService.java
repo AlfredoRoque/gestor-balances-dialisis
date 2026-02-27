@@ -9,70 +9,82 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.PatientRep
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.TEMPLATE_ENUM;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Service for sending emails to users, specifically for password recovery purposes.
- * It uses JavaMailSender to send emails and Thymeleaf TemplateEngine to generate email content from templates.
+ * Service responsible for handling email-related operations, such as sending recovery emails and balance reports to users.
+ * It utilizes the SendGrid API to send emails and Thymeleaf for email template processing.
  */
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class MailService {
 
-    private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
     private final PatientRepository patientRepository;
     private final MailTemplateRepository mailTemplateRepository;
+
+    @Value("${sendgrid.api.key}")
+    private String apiKey;
 
     @Value("${app.mail.from}")
     private String fromEmail;
 
     /**
-     * Email the user with a temporary password for password recovery.
+     * Sends a recovery email to the specified user with a temporary password.
      *
-     * @param user              The user to whom the email will be sent, containing their email and username.
-     * @param temporaryPassword The temporary password to be included in the email content.
-     * @throws MessagingException if there is an error while sending the email.
+     * @param user              the user to whom the recovery email will be sent
+     * @param temporaryPassword the temporary password to include in the email
      */
-    public void sendMailToRecoverPassword(User user, String temporaryPassword) throws MessagingException {
-        log.info(" for user: {}",user.getUsername());
+    public void sendMailToRecoverPassword(User user, String temporaryPassword) {
+
+        log.info("Sending recovery mail for user: {}", user.getUsername());
 
         Context context = new Context();
         context.setVariable("userName", user.getUsername());
         context.setVariable("password", temporaryPassword);
 
-        this.sendMail(TEMPLATE_ENUM.TEMPLATE_RECOVER_PASSWORD.getValue(),context,user.getEmail(),"Recuperar contraseña 🚀",null,null);
+        sendMail(
+                TEMPLATE_ENUM.TEMPLATE_RECOVER_PASSWORD.getValue(),
+                context,
+                user.getEmail(),
+                Constants.RECOVER_PASSWORD_SUBJECT,
+                null,
+                null
+        );
     }
 
     /**
-     * Emails the user with a balance report for a specified date range.
+     * Sends a balance report email to the specified patient with the generated PDF report attached.
      *
-     * @param response  A list containing the PDF report as a byte array, the filename, and the patient's name.
-     * @param patientId The ID of the patient to whom the email will be sent.
-     * @param startDate The start date of the balance report.
-     * @param endDate   The end date of the balance report.
-     * @throws MessagingException if there is an error while sending the email.
+     * @param response   the list containing the PDF bytes and file name for the balance report
+     * @param patientId  the ID of the patient to whom the email will be sent
+     * @param startDate  the start date of the balance report period
+     * @param endDate    the end date of the balance report period
      */
-    public void sendBalancesMailToUserMail(List<Object> response, Long patientId,
-                                           Instant startDate, Instant endDate) throws MessagingException {
+    public void sendBalancesMailToUserMail(List<Object> response,
+                                           Long patientId,
+                                           Instant startDate,
+                                           Instant endDate) {
 
         log.info("Sending balance mail for patientId: {}", patientId);
 
@@ -89,47 +101,79 @@ public class MailService {
         ZoneId zone = SecurityUtils.getUserZone();
         DateTimeFormatter formatterDay = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        this.sendMail(TEMPLATE_ENUM.TEMPLATE_BALANCE_REPORT.getValue(),context,patient.getUser().getEmail(),
-                String.format(
-                "Balance de %s de %s a %s 🚀",
+        String subject = String.format(
+                Constants.BALANCE_FILE_NAME,
                 patient.getName(),
                 startDate.atZone(zone).format(formatterDay),
-                endDate.atZone(zone).format(formatterDay)),(byte[]) response.get(0),(String) response.get(2));
+                endDate.atZone(zone).format(formatterDay)
+        );
+
+        sendMail(TEMPLATE_ENUM.TEMPLATE_BALANCE_REPORT.getValue(),
+                context, patient.getUser().getEmail(), subject, (byte[]) response.get(0), (String) response.get(2)
+        );
     }
 
     /**
-     * Helper method to send an email with the specified template, context, recipient email, subject, and optional PDF attachment.
+     * Prepares and sends an email using the SendGrid API with the specified template, context, recipient email, subject, and optional PDF attachment.
      *
-     * @param templateName The name of the email template to use for generating the email content.
-     * @param context      The Thymeleaf context containing variables to be replaced in the email template.
-     * @param email        The recipient's email address.
-     * @param subject      The subject of the email.
-     * @param pdfBytes     Optional byte array of a PDF file to be attached to the email. Can be null if no attachment is needed.
-     * @param fileName     The name of the PDF file to be attached. Required if pdfBytes is not null.
-     * @throws MessagingException if there is an error while sending the email.
+     * @param templateName the name of the email template to use
+     * @param context      the Thymeleaf context containing variables for template processing
+     * @param email        the recipient's email address
+     * @param subject      the subject of the email
+     * @param pdfBytes     the byte array of the PDF attachment (optional)
+     * @param fileName     the name of the PDF file to attach (optional)
      */
-    private void sendMail(String templateName, Context context, String email,String subject,byte[] pdfBytes,String fileName) throws MessagingException {
-        log.info("for mail {}", email);
-        MailTemplate template = mailTemplateRepository
-                .findByName(templateName);
+    private void sendMail(String templateName, Context context, String email,
+                          String subject, byte[] pdfBytes, String fileName) {
+        log.info("Preparing mail for {}", email);
 
+        MailTemplate template = mailTemplateRepository.findByName(templateName);
         String htmlContent = templateEngine.process(template.getContent(), context);
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        Email from = new Email(fromEmail);
+        Email to = new Email(email);
 
-        log.info("from mail {}", fromEmail);
-        helper.setFrom(fromEmail);
-        helper.setTo(email);
-        helper.setSubject(subject);
-        helper.setText(htmlContent, true);
-        if(Objects.nonNull(pdfBytes)) {
-            helper.addAttachment(
-                    fileName,
-                    new ByteArrayResource(pdfBytes));
+        Mail mail = new Mail();
+        mail.setFrom(from);
+        mail.setSubject(subject);
+
+        Personalization personalization = new Personalization();
+        personalization.addTo(to);
+        mail.addPersonalization(personalization);
+
+        mail.addContent(new Content("text/plain", Constants.NEW_MAIL_MESSAGE_NOTE));
+        mail.addContent(new Content("text/html", htmlContent));
+
+        if (Objects.nonNull(pdfBytes)) {
+            Attachments attachments = new Attachments();
+            attachments.setFilename(fileName);
+            attachments.setType("application/pdf");
+            attachments.setDisposition("attachment");
+            attachments.setContent(
+                    Base64.getEncoder().encodeToString(pdfBytes));
+            mail.addAttachments(attachments);
         }
-        log.info("sending mail...");
-        mailSender.send(message);
-        log.info("Successful send mail {}", email);
+
+        SendGrid sg = new SendGrid(apiKey);
+        Request request = new Request();
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint(Constants.SEND_MAIL_PROVIDER_ENDPOINT);
+            request.setBody(mail.build());
+
+            log.info("Sending mail via SendGrid API...");
+            Response response = sg.api(request);
+
+            log.info("SendGrid Status Code: {}", response.getStatusCode());
+            if (response.getStatusCode() != 202) {
+                log.error("SendGrid error body: {}", response.getBody());
+                throw new BalanceGlobalException(Constants.SEND_MAIL_ERROR, HttpStatus.CONFLICT.value());
+            }
+
+            log.info("Successful send mail to {}", email);
+        } catch (IOException ex) {
+            log.error("MAIL ERROR", ex);
+            throw new BalanceGlobalException(Constants.SEND_MAIL_ERROR, HttpStatus.CONFLICT.value());
+        }
     }
 }
