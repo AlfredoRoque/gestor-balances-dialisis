@@ -109,6 +109,7 @@ public class MailService {
      * @throws MessagingException if there is an error while sending the email.
      */
     private void sendMail(String templateName, Context context, String email,String subject,byte[] pdfBytes,String fileName) throws MessagingException {
+        log.info("for mail {}", email);
         MailTemplate template = mailTemplateRepository
                 .findByName(templateName);
 
@@ -117,6 +118,7 @@ public class MailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
+        log.info("from mail {}", fromEmail);
         helper.setFrom(fromEmail);
         helper.setTo(email);
         helper.setSubject(subject);
@@ -126,6 +128,7 @@ public class MailService {
                     fileName,
                     new ByteArrayResource(pdfBytes));
         }
+        log.info("sending mail...");
         mailSender.send(message);
         log.info("Successful send mail {}", email);
     }
