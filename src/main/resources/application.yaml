@@ -1,4 +1,24 @@
+KAFKA_TRUSTSTORE_BASE64: ${KAFKA_TRUSTSTORE_BASE64}
+KAFKA_KEYSTORE_BASE64: ${KAFKA_KEYSTORE_BASE64}
 spring:
+  kafka:
+    bootstrap-servers: ${AIVEN_HOST}
+
+    properties:
+      security.protocol: SSL
+      ssl.truststore.location: file:/tmp/client.truststore.jks
+      ssl.truststore.password: changeit
+      ssl.truststore.type: PKCS12
+      ssl.keystore.location: file:/tmp/client.keystore.jks
+      ssl.keystore.password: changeit
+      ssl.keystore.type: PKCS12
+      ssl.key.password: changeit
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
   mail:
     host: smtp.gmail.com
     port: 587
