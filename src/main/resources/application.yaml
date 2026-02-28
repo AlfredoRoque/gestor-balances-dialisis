@@ -6,10 +6,10 @@ spring:
 
     properties:
       security.protocol: SSL
-      ssl.truststore.location: file:/tmp/client.truststore.jks
+      ssl.truststore.location: ${ssl.truststore.location}
       ssl.truststore.password: changeit
       ssl.truststore.type: PKCS12
-      ssl.keystore.location: file:/tmp/client.keystore.jks
+      ssl.keystore.location: ${ssl.keystore.location}
       ssl.keystore.password: changeit
       ssl.keystore.type: PKCS12
       ssl.key.password: changeit
