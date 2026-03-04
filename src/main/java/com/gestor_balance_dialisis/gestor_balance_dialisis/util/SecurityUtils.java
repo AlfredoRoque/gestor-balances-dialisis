@@ -96,6 +96,23 @@ public class SecurityUtils {
     }
 
     /**
+     * Retrieves the user's role from the security context. If the role is not available, it defaults to null.
+     *
+     * @return the user's role as a UserRol enum
+     */
+    public UserRol getUserRol() {
+        UserSessionModel userSession = (UserSessionModel) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        if (Objects.nonNull(userSession.getRole())) {
+            return userSession.getRole();
+        }
+        return null;
+    }
+
+    /**
      * Decrypts the given encrypted password using the provided RsaKeyService. If decryption fails, it throws a BalanceGlobalException.
      *
      * @param encryptedPassword The encrypted password to be decrypted.

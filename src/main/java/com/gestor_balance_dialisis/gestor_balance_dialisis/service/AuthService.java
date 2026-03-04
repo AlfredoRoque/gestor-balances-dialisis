@@ -117,15 +117,24 @@ public class AuthService {
     }
 
     /**
-     * Logout a user by invalidating their existing JWT tokens.
+     * Invalidate the current user's JWT token by updating the token version, effectively logging out the user from all sessions.
+     * This method checks the user's role and updates the token version for either a User or a Patient accordingly.
      *
-     * @throws BalanceGlobalException if the user is not found.
+     * @throws BalanceGlobalException if the user or patient is not found.
      */
     public void logout() {
-        Optional<User> user = userRepository.findById(SecurityUtils.getUserId());
-        user.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
-        // Increment the token version to invalidate existing tokens
-        user.get().setTokenVersion(user.get().getTokenVersion() + 1);
-        userRepository.save(user.get());
+        if(SecurityUtils.getUserRol().equals(UserRol.ADMIN)){
+            Optional<User> user = userRepository.findById(SecurityUtils.getUserId());
+            user.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
+            // Increment the token version to invalidate existing tokens
+            user.get().setTokenVersion(user.get().getTokenVersion() + 1);
+            userRepository.save(user.get());
+        }else{
+            Optional<Patient> patient = patientRepository.findById(SecurityUtils.getUserId());
+            patient.orElseThrow(() -> new BalanceGlobalException(Constants.PATIENT_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
+            // Increment the token version to invalidate existing tokens
+            patient.get().setTokenVersion(patient.get().getTokenVersion() + 1);
+            patientRepository.save(patient.get());
+        }
     }
 }
