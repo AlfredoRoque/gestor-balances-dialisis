@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PatientRequest;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.StatusEnum;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.UserRol;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -57,6 +58,19 @@ public class Patient {
     @JoinColumn(name = "id_tipo_bolsa", nullable = false)
     private BagType bagType;
 
+    @Column(name = "contrasena")
+    private String password;
+
+    @Column(name = "correo", length = 80)
+    private String email;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol", length = 20)
+    private UserRol role = UserRol.PATIENT;
+
+    @Column(name = "sesion_version", columnDefinition = "BIGINT DEFAULT 0")
+    private Long tokenVersion = 0L;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FluidBalance> fluidBalances = new ArrayList<>();
@@ -74,10 +88,22 @@ public class Patient {
     private List<MedicineDetail> medicineDetails = new ArrayList<>();
 
     /**
-     * Constructor to create a Patient entity from a PatientRequest DTO.
+     * Constructor to create a Patient entity from a PatientRequest DTO and an encoded password.
      *
-     * @param patientRequest the PatientRequest DTO containing the patient's information
+     * @param patientRequest   the PatientRequest DTO containing the patient data
+     * @param encodedPassword the encoded password to be set for the patient
      */
+    public Patient(PatientRequest patientRequest, String encodedPassword) {
+        this.setId(patientRequest.getId());
+        this.setAge(patientRequest.getAge());
+        this.setName(patientRequest.getName());
+        this.setStatus(Objects.nonNull(patientRequest.getStatus())?StatusEnum.valueOf(patientRequest.getStatus()):this.status);
+        this.setUser(new User(patientRequest.getUserId()));
+        this.setBagType(new BagType(patientRequest.getBagTypeId()));
+        this.setPassword(encodedPassword);
+        this.setEmail(patientRequest.getEmail());
+    }
+
     public Patient(PatientRequest patientRequest) {
         this.setId(patientRequest.getId());
         this.setAge(patientRequest.getAge());
@@ -85,6 +111,8 @@ public class Patient {
         this.setStatus(Objects.nonNull(patientRequest.getStatus())?StatusEnum.valueOf(patientRequest.getStatus()):this.status);
         this.setUser(new User(patientRequest.getUserId()));
         this.setBagType(new BagType(patientRequest.getBagTypeId()));
+        this.setPassword(patientRequest.getPassword());
+        this.setEmail(patientRequest.getEmail());
     }
 
     /**

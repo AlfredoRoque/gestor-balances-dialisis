@@ -1,8 +1,11 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.security;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.UserSessionModel;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.UserRol;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.PatientRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.UserRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import jakarta.servlet.FilterChain;
@@ -37,6 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final PatientRepository patientRepository;
 
     /**
      * Intercepts incoming HTTP requests to validate the JWT token present in the "Authorization" header.
@@ -60,22 +64,33 @@ public class JwtFilter extends OncePerRequestFilter {
             if (header != null && header.startsWith("Bearer ")) {
                 String token = header.substring(7);
 
+                UserRol userRol = UserRol.valueOf(jwtUtil.extractClaim(token, claims -> claims.get("role", String.class)));
+
                 // validate the token and extract username and zone
                 UserSessionModel sessionModel = new UserSessionModel(jwtUtil.extractUsername(token),
                         jwtUtil.extractClaim(token, claims -> claims.get("zone", String.class)),
                         jwtUtil.extractClaim(token, claims -> claims.get("userId", Integer.class)),
-                        jwtUtil.extractClaim(token, claims -> claims.get("version", Integer.class)));
+                        jwtUtil.extractClaim(token, claims -> claims.get("version", Integer.class)),
+                        jwtUtil.extractClaim(token, claims -> claims.get("email", String.class)),
+                        userRol);
 
-                Optional<User> user = userRepository.findById(sessionModel.getUserId().longValue());
-                user.orElseThrow(() -> new BalanceGlobalException("User not found", HttpStatus.NOT_FOUND.value()));
-                if (sessionModel.getTokenVersion() != user.get().getTokenVersion().intValue()) {
-                    throw new BalanceGlobalException(Constants.INVALID_TOKEN, HttpStatus.UNAUTHORIZED.value());
+                if(sessionModel.getRole().equals(UserRol.ADMIN)) {
+                    Optional<User> user = userRepository.findByUsername(sessionModel.getUsername());
+                    user.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
+                    if (sessionModel.getTokenVersion() != user.get().getTokenVersion().intValue()) {
+                        throw new BalanceGlobalException(Constants.INVALID_TOKEN, HttpStatus.UNAUTHORIZED.value());
+                    }
+                }else{
+                    Optional<Patient> patient = patientRepository.findByName(sessionModel.getUsername());
+                    patient.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
+                    if (sessionModel.getTokenVersion() != patient.get().getTokenVersion().intValue()) {
+                        throw new BalanceGlobalException(Constants.INVALID_TOKEN, HttpStatus.UNAUTHORIZED.value());
+                    }
                 }
 
                 if (sessionModel.getUsername() != null && !sessionModel.getUsername().isEmpty()) {
-                    // create a simple authentication token with the username and a default role
                     Collection<GrantedAuthority> authorities = new ArrayList<>();
-                    authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                    authorities.add(new SimpleGrantedAuthority(sessionModel.getRole().name()));
 
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(sessionModel, null, authorities);

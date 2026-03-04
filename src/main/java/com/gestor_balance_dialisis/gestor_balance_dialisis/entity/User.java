@@ -54,7 +54,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rol", length = 20, nullable = false)
-    private UserRol rol;
+    private UserRol rol = UserRol.ADMIN;
 
     @Column(name = "fecha_creacion", nullable = false)
     private Instant creationDate;
@@ -85,7 +85,7 @@ public class User {
         this.setEmail(user.getEmail());
         this.setRol(user.getRol());
         this.setStatus(StatusEnum.ACTIVO);
-        this.setRol(UserRol.USER);
+        this.setRol(UserRol.ADMIN);
         this.setCreationDate(Instant.now());
         this.setPassword(encodedPassword);
     }

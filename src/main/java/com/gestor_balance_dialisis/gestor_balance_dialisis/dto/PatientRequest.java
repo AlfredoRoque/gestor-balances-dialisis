@@ -1,6 +1,7 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -44,4 +45,14 @@ public class PatientRequest implements Serializable {
     @Schema(description = "Patient bag type id", example = "1")
     @NotNull(message = "Patient bag type id is required")
     private Long bagTypeId;
+
+    @Schema(description = "User password", example = "P@ssw0rd")
+    @NotBlank(message = "Password is required")
+    @NotNull(message = "Password is required")
+    private String password;
+
+    @NotBlank(message = "Email is required")
+    @NotNull(message = "Email is required")
+    @Email(message = "Invalid email format")
+    private String email;
 }

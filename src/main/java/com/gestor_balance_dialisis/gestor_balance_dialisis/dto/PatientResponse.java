@@ -43,6 +43,9 @@ public class PatientResponse implements Serializable {
     @Schema(description = "Patient status", example = "ACTIVO")
     private String status;
 
+    @Schema(description = "Patient email", example = "John_Doe@gmail.com")
+    private String email;
+
     /**
      * Constructs a PatientResponse object based on a Patient entity.
      *
@@ -55,5 +58,6 @@ public class PatientResponse implements Serializable {
         this.setStatus(patient.getStatus().name());
         this.setUserId(Objects.nonNull(patient.getUser())?patient.getUser().getId():null);
         this.setBagType(Objects.nonNull(patient.getBagType())?new BagTypeResponse(patient.getBagType()):null) ;
+        this.setEmail(patient.getEmail());
     }
 }

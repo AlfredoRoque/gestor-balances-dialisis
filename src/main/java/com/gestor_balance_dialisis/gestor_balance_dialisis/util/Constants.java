@@ -33,4 +33,6 @@ public class Constants {
     public static final String NEW_MAIL_MESSAGE_NOTE = "Tienes un nuevo mensaje.";
     public static final String BALANCE_FILE_NAME = "Balance de %s de %s a %s";
     public static final String RECOVER_PASSWORD_SUBJECT = "Recuperar contraseña.";
+    public static final String PATIENT_ALREADY_EXIST = "Ya existe un paciente registrado con el nombre que intentas registrar.";
+    public static final String SAME_PASSWORD = "N/A";
 }

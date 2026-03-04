@@ -1,5 +1,6 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.security;
 
+import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import io.jsonwebtoken.Claims;
@@ -28,14 +29,36 @@ public class JwtUtil {
     private long EXPIRATION;
 
     /**
-     * Generates a JWT token for the given username.
+     * Generates a JWT token for the given username and user details.
      *
      * @param username The username for which the token is generated.
-     * @return A JWT token containing the username as the subject, with an expiration time.
+     * @param user     The user entity containing details such as token version and ID.
+     * @param timeZone The time zone of the user, included in the token claims.
+     * @return A JWT token as a String.
      */
     public String generateToken(String username, User user, String timeZone) {
         return Jwts.builder()
-                .setClaims(SecurityUtils.getUserClaims(user, timeZone))
+                .setClaims(SecurityUtils.getUserClaims(user.getTokenVersion().intValue(),user.getId(),
+                        user.getRol(),user.getEmail(), timeZone))
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    /**
+     * Generates a JWT token for the given username and patient details.
+     *
+     * @param username The username for which the token is generated.
+     * @param patient  The patient entity containing details such as token version and ID.
+     * @param timeZone The time zone of the patient, included in the token claims.
+     * @return A JWT token as a String.
+     */
+    public String generateToken(String username, Patient patient, String timeZone) {
+        return Jwts.builder()
+                .setClaims(SecurityUtils.getUserClaims(patient.getTokenVersion().intValue(),patient.getId(),
+                        patient.getRole(),patient.getEmail(), timeZone))
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
