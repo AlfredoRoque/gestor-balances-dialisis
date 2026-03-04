@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface for managing Patient entities in the database.
@@ -15,4 +16,5 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     List<Patient> findByUserId(Long id);
 
+    Optional<Patient> findByName(String name);
 }

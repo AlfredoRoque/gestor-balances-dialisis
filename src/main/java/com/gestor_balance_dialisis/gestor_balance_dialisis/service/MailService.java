@@ -109,7 +109,7 @@ public class MailService {
         );
 
         sendMail(TEMPLATE_ENUM.TEMPLATE_BALANCE_REPORT.getValue(),
-                context, patient.getUser().getEmail(), subject, (byte[]) response.get(0), (String) response.get(2)
+                context, SecurityUtils.getUserEmail(), subject, (byte[]) response.get(0), (String) response.get(2)
         );
     }
 

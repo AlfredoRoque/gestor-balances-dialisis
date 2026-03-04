@@ -1,8 +1,11 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.service;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.*;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.UserRol;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.PatientRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.UserRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.security.JwtUtil;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.security.RsaKeyService;
@@ -30,6 +33,7 @@ public class AuthService {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final PatientRepository patientRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final RsaKeyService rsaKeyService;
@@ -42,18 +46,38 @@ public class AuthService {
      * @throws BalanceGlobalException if the credentials are invalid.
      */
     public JwtResponse login(LoginRequest request) {
-        log.info("for user: {}",request.getUsername());
+        String rawPassword = SecurityUtils.decryptPassword(request.getPassword(),rsaKeyService);
+        if(request.getRole().equals(UserRol.PATIENT)){
+            log.info("for {}: {}",UserRol.PATIENT,request.getUsername());
+            Optional<Patient> patient = patientRepository.findByName(request.getUsername());
+            patient.orElseThrow(() -> new BalanceGlobalException(Constants.PATIENT_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
+
+            this.validatePassword(rawPassword,patient.get().getPassword());
+            patient.get().setTokenVersion(Long.parseLong(String.valueOf(ThreadLocalRandom.current().nextInt(1, 10_000_001))));
+            patientRepository.save(patient.get());
+            return new JwtResponse(jwtUtil.generateToken(request.getUsername(), patient.get(), request.getTimeZone()));
+        }
+        log.info("for {}: {}", UserRol.ADMIN, request.getUsername());
         Optional<User> user = userRepository.findByUsername(request.getUsername());
         user.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
 
-        String rawPassword = SecurityUtils.decryptPassword(request.getPassword(),rsaKeyService);
-
-        if (!passwordEncoder.matches(rawPassword, user.get().getPassword())) {
-            throw new BalanceGlobalException(Constants.INVALID_CREDENTIALS, HttpStatus.CONFLICT.value());
-        }
+        this.validatePassword(rawPassword,user.get().getPassword());
         user.get().setTokenVersion(Long.parseLong(String.valueOf(ThreadLocalRandom.current().nextInt(1, 10_000_001))));
         userRepository.save(user.get());
         return new JwtResponse(jwtUtil.generateToken(request.getUsername(), user.get(), request.getTimeZone()));
+    }
+
+    /**
+     * Validate if the provided raw password matches the encoded password, throws an exception if they do not match.
+     *
+     * @param rawPassword     The raw password to be validated.
+     * @param encodedPassword The encoded password to compare against.
+     * @throws BalanceGlobalException if the passwords do not match.
+     */
+    private void validatePassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new BalanceGlobalException(Constants.INVALID_CREDENTIALS, HttpStatus.CONFLICT.value());
+        }
     }
 
     /**

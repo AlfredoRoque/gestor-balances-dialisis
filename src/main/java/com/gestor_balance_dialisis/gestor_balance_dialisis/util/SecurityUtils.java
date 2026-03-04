@@ -1,11 +1,12 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.util;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.UserSessionModel;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.UserRol;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.security.RsaKeyService;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -24,17 +25,20 @@ import java.util.Objects;
 public class SecurityUtils {
 
     /**
-     * Generates a map of claims for the given user, including the user's time zone, token version, and user ID.
+     * Constructs a map of user claims to be included in the JWT token. The claims include the user's time zone, token version, and user ID.
      *
-     * @param user     The user for whom the claims are being generated.
-     * @param timeZone The time zone to be included in the claims.
-     * @return A map containing the user's claims.
+     * @param tokenVersion the version of the token, used for invalidating old tokens when necessary.
+     * @param id           the ID of the user, which can be used to identify the user in the system.
+     * @param timeZone     the time zone of the user, which can be used for time-related operations in the application.
+     * @return a map containing the user claims to be included in the JWT token.
      */
-    public static Map<String, Object> getUserClaims(User user, String timeZone) {
+    public static Map<String, Object> getUserClaims(Integer tokenVersion, Long id, UserRol rol, String email, String timeZone) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("zone", timeZone);
-        claims.put("version", user.getTokenVersion().intValue());
-        claims.put("userId", user.getId());
+        claims.put("version", tokenVersion);
+        claims.put("role", rol.toString());
+        claims.put("email", email);
+        claims.put("userId", id);
 
         return claims;
     }
@@ -72,6 +76,23 @@ public class SecurityUtils {
             return userSession.getUserId().longValue();
         }
         return 0L;
+    }
+
+    /**
+     * Retrieves the user's email from the security context. If the email is not available, it defaults to an empty string.
+     *
+     * @return the user's email as a String
+     */
+    public static String getUserEmail() {
+        UserSessionModel userSession = (UserSessionModel) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        if (Objects.nonNull(userSession.getEmail())) {
+            return userSession.getEmail();
+        }
+        return StringUtils.EMPTY;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.dto;
 
+import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.UserRol;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,4 +34,10 @@ public class UserSessionModel implements Serializable {
 
     @Schema(description = "User session token version", example = "1")
     private Integer tokenVersion;
+
+    @Schema(description = "User email", example = "john_doe@gmail.com")
+    private String email;
+
+    @Schema(description = "User role", example = "PATIENT")
+    private UserRol role;
 }

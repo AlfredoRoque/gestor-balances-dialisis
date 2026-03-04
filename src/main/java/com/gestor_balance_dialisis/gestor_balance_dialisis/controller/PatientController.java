@@ -46,6 +46,18 @@ public class PatientController {
     }
 
     /**
+     * Endpoint to retrieve a patient by their ID.
+     *
+     * @param patientId the ID of the patient to be retrieved
+     * @return ResponseEntity containing the patient response for the specified patient ID
+     */
+    @Operation(summary = "Get patients by ID", description = "Endpoint to retrieve a patient by their ID.")
+    @GetMapping("/{patientId}")
+    public ResponseEntity<PatientResponse> findById(@PathVariable Long patientId) {
+        return ResponseEntity.ok(patientService.findById(patientId));
+    }
+
+    /**
      * Endpoint to update an existing patient.
      *
      * @param patientId      the ID of the patient to be updated
