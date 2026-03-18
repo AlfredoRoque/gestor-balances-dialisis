@@ -12,7 +12,6 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,7 +53,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rol", length = 20, nullable = false)
-    private UserRol rol = UserRol.ADMIN;
+    private UserRol role = UserRol.ADMIN;
 
     @Column(name = "fecha_creacion", nullable = false)
     private Instant creationDate;
@@ -83,9 +82,9 @@ public class User {
         this.setId(user.getId());
         this.setUsername(user.getUsername());
         this.setEmail(user.getEmail());
-        this.setRol(user.getRol());
+        this.setRole(user.getRol());
         this.setStatus(StatusEnum.ACTIVO);
-        this.setRol(UserRol.ADMIN);
+        this.setRole(UserRol.ADMIN);
         this.setCreationDate(Instant.now());
         this.setPassword(encodedPassword);
     }

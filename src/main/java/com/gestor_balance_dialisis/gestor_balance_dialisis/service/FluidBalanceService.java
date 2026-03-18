@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -41,6 +42,7 @@ public class FluidBalanceService {
     private final ReportService reportService;
     private final PatientRepository patientRepository;
     private final MailService mailService;
+    private final SubscriptionService  subscriptionService;
 
     /**
      * Saves a new fluid balance record based on the provided request data.
@@ -50,6 +52,18 @@ public class FluidBalanceService {
      */
     public FluidBalanceResponse save(FluidBalanceRequest fluidBalanceRequest) {
         log.info("patientId : {}",fluidBalanceRequest.getPatientId());
+
+        Optional<Patient> patient = patientRepository.findById(fluidBalanceRequest.getPatientId());
+        patient.orElseThrow(() -> new BalanceGlobalException(Constants.PATIENT_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
+
+        SubscriptionDto subs = subscriptionService.getSubscription(patient.get().getUser().getId());
+        if (!Utility.isSpecialPlan(subs.getPlan().getName())) {
+            if(fluidBalanceRepository.countByPatientId(patient.get().getId())>=subs.getPlan().getParametersPlan().getMaxBalance()){
+                throw new BalanceGlobalException(String.format(Constants.BALANCES_PLAN_LIMIT,
+                        subs.getPlan().getParametersPlan().getMaxBalance(),subs.getPlan().getName(),subs.getPlan().getParametersPlan().getMaxBalance()), HttpStatus.CONFLICT.value());
+            }
+        }
+
         if(fluidBalanceRepository.findByDateAndPatientId(fluidBalanceRequest.getDate(), fluidBalanceRequest.getPatientId()).isEmpty()){
             return new FluidBalanceResponse(fluidBalanceRepository.save(new FluidBalance(fluidBalanceRequest)));
         }
@@ -280,6 +294,35 @@ public class FluidBalanceService {
         List<Object> response = this.getReportBalanceFluidForPatient(patientId, startDate, endDate);
         if (!response.isEmpty()) {
             mailService.sendBalancesMailToUserMail(response,patientId,startDate ,endDate);
+        }
+    }
+
+    /**
+     * Cleans fluid balance records for a patient and user based on the provided date. It deletes records that are older than the allowed history days defined in the user's subscription plan.
+     * @param userId the ID of the user whose patient's fluid balance records are to be cleaned
+     * @param actualDay the date used to determine which records should be deleted based on the allowed history days in the user's subscription plan
+     */
+    public void cleanFluidBalanceForPatientAndUser(Long userId, Instant actualDay) {
+        log.info("Start cleanFluidBalanceForPatientAndUser for userId: {}", userId);
+        List<Patient> patients = patientRepository.findByUserId(userId);
+        if(patients.isEmpty()){
+            log.info(Constants.USER_PATIENTS_NOT_FOUND, userId);
+            return;
+        }
+
+        SubscriptionDto subscriptionDto = subscriptionService.getSubscription(userId);
+        if (!Utility.isSpecialPlan(subscriptionDto.getPlan().getName())) {
+            Instant filterDate = actualDay.minus(subscriptionDto.getPlan().getParametersPlan().getHistoryDays(), ChronoUnit.DAYS);
+            patients.forEach(patient -> {
+                try {
+                    fluidBalanceRepository.deleteByPatientIdAndDateBefore(patient.getId(),filterDate);
+                    extraFluidRepository.deleteByPatientIdAndDateBefore(patient.getId(),filterDate);
+                    vitalSignDetailRepository.deleteByPatientIdAndDateBefore(patient.getId(),filterDate);
+                }catch (Exception e){
+                    log.info(Constants.CLEAN_BALANCES_ERROR,patient.getId(),userId);
+                    log.error(":::",e);
+                }
+            });
         }
     }
 }

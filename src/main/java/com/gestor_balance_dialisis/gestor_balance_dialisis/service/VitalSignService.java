@@ -30,6 +30,7 @@ public class VitalSignService {
 
     private final VitalSignRepository vitalSignRepository;
     private final VitalSignDetailRepository vitalSignDetailRepository;
+    private final SubscriptionService subscriptionService;
 
     /**
      * Saves a new vital sign record based on the provided request data.
@@ -40,6 +41,13 @@ public class VitalSignService {
     @Transactional
     public VitalSignResponse save(VitalSignRequest vitalSignRequest) {
         log.info(" vital sign : {}",vitalSignRequest.getName());
+        SubscriptionDto subs = subscriptionService.getSubscription(vitalSignRequest.getUserId());
+        if (!Utility.isSpecialPlan(subs.getPlan().getName())) {
+            if (vitalSignRepository.countByUserId(SecurityUtils.getUserId())>=subs.getPlan().getParametersPlan().getMaxVitalSigna()) {
+                throw new BalanceGlobalException(String.format(Constants.VITAL_SIGNS_PLAN_LIMIT,
+                        subs.getPlan().getParametersPlan().getMaxVitalSigna(), subs.getPlan().getName(), subs.getPlan().getParametersPlan().getMaxVitalSigna()), HttpStatus.CONFLICT.value());
+            }
+        }
         return new VitalSignResponse(vitalSignRepository.save(new VitalSign(vitalSignRequest)));
     }
 

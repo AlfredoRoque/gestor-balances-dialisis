@@ -21,7 +21,9 @@ public class Constants {
     public static final String MEDICINE_DETAIL_NOT_FOUND = "Detalle de medicina no encontrado.";
     public static final String MEDICINE_NOT_FOUND = "Medicina no encontrada.";
     public static final String PATIENT_NOT_FOUND = "Paciente no encontrado";
+    public static final String USER_PATIENTS_NOT_FOUND = "Patients not found for user: {}";
     public static final String GENERATE_REPORT_ERROR = "Error al generar el reporte del paciente.";
+    public static final String CLEAN_BALANCES_ERROR = "failed to clean fluid balance for patient: {} whit user: {}";
     public static final String FLUID_BALANCE_DOEST_EXIST = "No existe el balance de fluido.";
     public static final String EXTRA_FLUID_NOT_FOUND = "No se encontró fluido extra para el ID: %s";
     public static final String FLUID_BALANCE_EXIST = "Ya existe un balance de fluido registrado para la fecha y paciente.";
@@ -35,4 +37,15 @@ public class Constants {
     public static final String RECOVER_PASSWORD_SUBJECT = "Recuperar contraseña.";
     public static final String PATIENT_ALREADY_EXIST = "Ya existe un paciente registrado con el nombre que intentas registrar.";
     public static final String SAME_PASSWORD = "N/A";
+
+    public static final String PATIENT_PLAN_LIMIT = "Ya tienes %s paciente/s registrados, el plan %s solo permite %s paciente/s por usuario.";
+    public static final String BALANCES_PLAN_LIMIT = "Ya tienes %s balance/s registrados, el plan %s solo permite %s balance/s por paciente, contacta a tu administrador.";
+    public static final String MEDICINES_PLAN_LIMIT = "Ya tienes %s medicamento/s registrados, el plan %s solo permite %s medicamento/s por usuario.";
+    public static final String VITAL_SIGNS_PLAN_LIMIT = "Ya tienes %s signo/s vital/es registrado/s, el plan %s solo permite %s signo/s vital/es registrado/s por usuario.";
+
+    public static final String MESSAGE_NOTIFICATION_FOR_CLEAN_HISTORY = "Informa a tus pacientes que generen el respaldo de sus balances anteriores al %s o generalo tu para evitar perderlos permanentemente.";
+
+    public static String NO_AUTH = "NO_AUTH";
+    public static int DAYS_BEFORE_CLEAN_BALANCES = 5;
+    public static String SPECIAL_PLAN = "SPECIAL";
 }

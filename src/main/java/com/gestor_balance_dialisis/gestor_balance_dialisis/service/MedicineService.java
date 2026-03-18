@@ -9,6 +9,7 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.MedicineDe
 import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.MedicineRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class MedicineService {
 
     private final MedicineRepository medicineRepository;
     private final MedicineDetailRepository medicineDetailRepository;
+    private final SubscriptionService subscriptionService;
 
     /**
      * Saves a new medicine record based on the provided request data.
@@ -40,6 +42,14 @@ public class MedicineService {
     @Transactional
     public MedicineResponse save(MedicineRequest medicineRequest) {
         log.info(" medicine : {}",medicineRequest.getName());
+        SubscriptionDto subs = subscriptionService.getSubscription(medicineRequest.getUserId());
+        if (!Utility.isSpecialPlan(subs.getPlan().getName())) {
+            if (medicineRepository.countByUserId(SecurityUtils.getUserId())>=subs.getPlan().getParametersPlan().getMaxMedicines()) {
+                throw new BalanceGlobalException(String.format(Constants.MEDICINES_PLAN_LIMIT,
+                        subs.getPlan().getParametersPlan().getMaxMedicines(), subs.getPlan().getName(), subs.getPlan().getParametersPlan().getMaxMedicines()), HttpStatus.CONFLICT.value());
+            }
+        }
+
         return new MedicineResponse(medicineRepository.save(new Medicine(medicineRequest)));
     }
 

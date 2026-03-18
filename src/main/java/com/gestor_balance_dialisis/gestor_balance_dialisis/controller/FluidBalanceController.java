@@ -1,8 +1,6 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.controller;
 
-import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.CalculateFluidBalanceResponseDto;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.FluidBalanceRequest;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.FluidBalanceResponse;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.*;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.service.FluidBalanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**

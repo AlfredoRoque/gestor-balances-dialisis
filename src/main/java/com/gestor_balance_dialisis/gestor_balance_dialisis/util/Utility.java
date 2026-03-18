@@ -4,6 +4,8 @@ import lombok.experimental.UtilityClass;
 
 import java.security.SecureRandom;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 
 /**
  * Utility class for common helper methods.
@@ -65,16 +67,31 @@ public class Utility {
     }
 
     /**
-     * Checks if two Instants fall on the same calendar day in the specified time zone.
-     *
-     * @param i1   The first Instant to compare.
-     * @param i2   The second Instant to compare.
-     * @param zone The time zone to use for the comparison.
-     * @return true if both Instants fall on the same calendar day in the specified time zone, false otherwise.
+     * Returns the Instant representing the last day of the current month at the maximum time (23:59:59.999999999) in the user's time zone.
+     * @return Instant representing the last day of the current month at the maximum time in the user's time zone.
      */
-    public static boolean isSameDay(Instant i1, Instant i2, ZoneId zone) {
-        LocalDate d1 = i1.atZone(zone).toLocalDate();
-        LocalDate d2 = i2.atZone(zone).toLocalDate();
-        return d1.equals(d2);
+    public static Instant getLastDayOfMonth() {
+        Instant instant = Instant.now();
+        ZoneId zone = SecurityUtils.getUserZone();
+        LocalDate date = instant.atZone(zone).toLocalDate();
+        LocalDate lastDay = date.with(TemporalAdjusters.lastDayOfMonth());
+        return endDay(lastDay
+                .atTime(LocalTime.MAX)
+                .atZone(zone)
+                .toInstant());
+    }
+
+    /**
+     * Subtracts a specified number of days from the given Instant and returns the resulting Instant.
+     * @param days days to subtract from the given Instant.
+     * @param lastDay the Instant from which to subtract the specified number of days.
+     * @return Instant subtracted by the specified number of days from the given Instant.
+     */
+    public static Instant minusDays(int days, Instant lastDay) {
+        return lastDay.minus(days, ChronoUnit.DAYS);
+    }
+
+    public static boolean isSpecialPlan(String planName){
+        return planName.equals(Constants.SPECIAL_PLAN);
     }
 }

@@ -15,7 +15,6 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Date;
 
 /**
  * Data Transfer Object (DTO) for User entity, used for transferring user data between different layers of the application, such as from the service layer to the controller layer or vice versa.
@@ -67,22 +66,7 @@ public class UserDto implements Serializable {
         this.setUsername(user.getUsername());
         this.setEmail(user.getEmail());
         this.setStatus(user.getStatus());
-        this.setRol(user.getRol());
+        this.setRol(user.getRole());
         this.setCreationDate(user.getCreationDate());
-    }
-
-    /**
-     * Constructor to create a new UserDto instance by copying the properties of a User object for save purposes, including a temporary password for password recovery scenarios.
-     * @param user The User object from which to copy the properties to create the UserDto instance.
-     * @param temporaryPassword The temporary password to be set in the UserDto instance for password
-     */
-    public UserDto(User user, String temporaryPassword) {
-        this.setId(user.getId());
-        this.setUsername(user.getUsername());
-        this.setEmail(user.getEmail());
-        this.setStatus(user.getStatus());
-        this.setRol(user.getRol());
-        this.setCreationDate(user.getCreationDate());
-        this.setPassword(temporaryPassword);
     }
 }

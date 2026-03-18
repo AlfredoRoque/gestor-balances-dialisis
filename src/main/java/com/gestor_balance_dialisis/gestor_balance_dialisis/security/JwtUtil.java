@@ -31,15 +31,14 @@ public class JwtUtil {
     /**
      * Generates a JWT token for the given username and user details.
      *
-     * @param username The username for which the token is generated.
-     * @param user     The user entity containing details such as token version and ID.
-     * @param timeZone The time zone of the user, included in the token claims.
+     * @param username         The username for which the token is generated.
+     * @param user             The user entity containing details such as token version and ID.
+     * @param timeZone         The time zone of the user, included in the token claims.
      * @return A JWT token as a String.
      */
-    public String generateToken(String username, User user, String timeZone) {
+    public String generateUserToken(String username, User user, String timeZone) {
         return Jwts.builder()
-                .setClaims(SecurityUtils.getUserClaims(user.getTokenVersion().intValue(),user.getId(),
-                        user.getRol(),user.getEmail(), timeZone))
+                .setClaims(SecurityUtils.getUserClaims(user, timeZone))
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
@@ -55,10 +54,9 @@ public class JwtUtil {
      * @param timeZone The time zone of the patient, included in the token claims.
      * @return A JWT token as a String.
      */
-    public String generateToken(String username, Patient patient, String timeZone) {
+    public String generatePatientToken(String username, Patient patient, String timeZone) {
         return Jwts.builder()
-                .setClaims(SecurityUtils.getUserClaims(patient.getTokenVersion().intValue(),patient.getId(),
-                        patient.getRole(),patient.getEmail(), timeZone))
+                .setClaims(SecurityUtils.getPatientClaims(patient, timeZone))
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))

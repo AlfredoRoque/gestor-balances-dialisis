@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -49,13 +50,17 @@ public class AuthService {
         String rawPassword = SecurityUtils.decryptPassword(request.getPassword(),rsaKeyService);
         if(request.getRole().equals(UserRol.PATIENT)){
             log.info("for {}: {}",UserRol.PATIENT,request.getUsername());
-            Optional<Patient> patient = patientRepository.findByName(request.getUsername());
+            List<Patient> patients = patientRepository.findByName(request.getUsername());
+            if(patients.isEmpty()){
+                throw new BalanceGlobalException(Constants.PATIENT_NOT_FOUND, HttpStatus.NOT_FOUND.value());
+            }
+            Optional<Patient> patient = patients.stream().filter(res -> res.getName().equals(request.getUsername())&& passwordEncoder.matches(rawPassword, res.getPassword())).findFirst();
             patient.orElseThrow(() -> new BalanceGlobalException(Constants.PATIENT_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
 
             this.validatePassword(rawPassword,patient.get().getPassword());
             patient.get().setTokenVersion(Long.parseLong(String.valueOf(ThreadLocalRandom.current().nextInt(1, 10_000_001))));
             patientRepository.save(patient.get());
-            return new JwtResponse(jwtUtil.generateToken(request.getUsername(), patient.get(), request.getTimeZone()));
+            return new JwtResponse(jwtUtil.generatePatientToken(request.getUsername(), patient.get(), request.getTimeZone()));
         }
         log.info("for {}: {}", UserRol.ADMIN, request.getUsername());
         Optional<User> user = userRepository.findByUsername(request.getUsername());
@@ -64,7 +69,7 @@ public class AuthService {
         this.validatePassword(rawPassword,user.get().getPassword());
         user.get().setTokenVersion(Long.parseLong(String.valueOf(ThreadLocalRandom.current().nextInt(1, 10_000_001))));
         userRepository.save(user.get());
-        return new JwtResponse(jwtUtil.generateToken(request.getUsername(), user.get(), request.getTimeZone()));
+        return new JwtResponse(jwtUtil.generateUserToken(request.getUsername(), user.get(), request.getTimeZone()));
     }
 
     /**
@@ -93,9 +98,6 @@ public class AuthService {
 
     /**
      * Recover the password for a user with the given email, returns true if the email exists, otherwise throws an exception.
-     *
-     * TODO: Validate migration to kafka for password recovery process, currently it is a simple implementation that sends an email to the user with a temporary password,
-     *  but it can be improved by using a more robust and scalable solution like Kafka to handle the password recovery process asynchronously and reliably.
      *
      * @param email The email of the user to recover the password for.
      * @throws BalanceGlobalException if the email does not exist.
