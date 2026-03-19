@@ -23,4 +23,6 @@ public interface FluidBalanceRepository extends JpaRepository<FluidBalance, Long
 
     @Transactional
     void deleteByPatientIdAndDateBefore(Long patientId, Instant date);
+
+    List<FluidBalance> findByPatientId(Long patientId);
 }

@@ -166,6 +166,7 @@ public class VitalSignService {
         log.info(" vitalSignId : {}",vitalSignId);
         Optional<VitalSign> vitalSign = vitalSignRepository.findById(vitalSignId);
         if(vitalSign.isPresent()){
+            vitalSignDetailRepository.findByVitalSignId(vitalSignId).forEach(vitalSignDetail -> vitalSignDetailRepository.deleteById(vitalSignDetail.getId()));
             vitalSignRepository.deleteById(vitalSignId);
             return;
         }

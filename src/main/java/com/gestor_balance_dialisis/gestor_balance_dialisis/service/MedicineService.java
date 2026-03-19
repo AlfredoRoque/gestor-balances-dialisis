@@ -153,6 +153,7 @@ public class MedicineService {
         log.info(" medicine ID : {}",medicineId);
         Optional<Medicine> medicine = medicineRepository.findById(medicineId);
         if(medicine.isPresent()){
+            medicineDetailRepository.findByMedicineId(medicineId).forEach(medicineDetail -> medicineDetailRepository.deleteById(medicineDetail.getId()));
             medicineRepository.deleteById(medicineId);
             return;
         }

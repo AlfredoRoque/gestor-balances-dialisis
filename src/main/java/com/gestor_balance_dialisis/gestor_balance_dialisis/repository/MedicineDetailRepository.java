@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,4 +18,8 @@ public interface MedicineDetailRepository extends JpaRepository<MedicineDetail, 
     List<MedicineDetail> getMedicineDetailByPatientIdAndStatusOrderByDateAsc(Long patientId, StatusEnum status);
 
     List<MedicineDetail> getMedicineDetailByPatientIdAndDateIsBetweenAndStatusOrderByDateAsc(Long patientId, Instant dateBefore, Instant dateAfter, StatusEnum status);
+
+    List<MedicineDetail> findByPatientId(Long patientId);
+
+    List<MedicineDetail> findByMedicineId(Long medicineId);
 }

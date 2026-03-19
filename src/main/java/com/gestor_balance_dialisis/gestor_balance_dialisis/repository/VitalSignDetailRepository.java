@@ -7,9 +7,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface for managing VitalSignDetail entities, providing CRUD operations and database interactions.
@@ -21,4 +20,8 @@ public interface VitalSignDetailRepository extends JpaRepository<VitalSignDetail
 
     @Transactional
     void deleteByPatientIdAndDateBefore(Long patientId, Instant filterDate);
+
+    List<VitalSignDetail> findByPatientId(Long patientId);
+
+    List<VitalSignDetail> findByVitalSignId(Long vitalSignId);
 }

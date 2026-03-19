@@ -21,4 +21,6 @@ public interface ExtraFluidRepository extends JpaRepository<ExtraFluid, Long> {
 
     @Transactional
     void deleteByPatientIdAndDateBefore(Long patientId, Instant filterDate);
+
+    List<ExtraFluid> findByPatientId(Long patientId);
 }
