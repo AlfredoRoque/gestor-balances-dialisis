@@ -72,6 +72,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         jwtUtil.extractClaim(token, claims -> claims.get("userId", Integer.class)),
                         jwtUtil.extractClaim(token, claims -> claims.get("version", Integer.class)),
                         jwtUtil.extractClaim(token, claims -> claims.get("email", String.class)),
+                        jwtUtil.extractClaim(token, claims -> claims.get("userAdminId", Integer.class)),
                         userRol);
 
                 if(sessionModel.getRole().equals(UserRol.ADMIN)) {
@@ -81,7 +82,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         throw new BalanceGlobalException(Constants.INVALID_TOKEN, HttpStatus.UNAUTHORIZED.value());
                     }
                 }else{
-                    Optional<Patient> patient = patientRepository.findByName(sessionModel.getUsername());
+                    Optional<Patient> patient = patientRepository.findByNameAndUserId(sessionModel.getUsername(),sessionModel.getUserAdminId().longValue());
                     patient.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
                     if (sessionModel.getTokenVersion() != patient.get().getTokenVersion().intValue()) {
                         throw new BalanceGlobalException(Constants.INVALID_TOKEN, HttpStatus.UNAUTHORIZED.value());

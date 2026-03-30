@@ -1,14 +1,19 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.util;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.UserSessionModel;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.User;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.enums.UserRol;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.security.RsaKeyService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -27,18 +32,30 @@ public class SecurityUtils {
     /**
      * Constructs a map of user claims to be included in the JWT token. The claims include the user's time zone, token version, and user ID.
      *
-     * @param tokenVersion the version of the token, used for invalidating old tokens when necessary.
-     * @param id           the ID of the user, which can be used to identify the user in the system.
-     * @param timeZone     the time zone of the user, which can be used for time-related operations in the application.
+     * @param user             the user entity containing details such as role, email, and ID, which are included in the token claims.
+     * @param timeZone         the time zone of the user, which can be used for time-related operations in the application.
      * @return a map containing the user claims to be included in the JWT token.
      */
-    public static Map<String, Object> getUserClaims(Integer tokenVersion, Long id, UserRol rol, String email, String timeZone) {
+    public static Map<String, Object> getUserClaims(User user, String timeZone) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("zone", timeZone);
-        claims.put("version", tokenVersion);
-        claims.put("role", rol.toString());
-        claims.put("email", email);
-        claims.put("userId", id);
+        claims.put("version", user.getTokenVersion().intValue());
+        claims.put("role", user.getRole().toString());
+        claims.put("email", user.getEmail());
+        claims.put("userId", user.getId());
+        claims.put("userAdminId", user.getId());
+
+        return claims;
+    }
+
+    public static Map<String, Object> getPatientClaims(Patient patient, String timeZone) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("zone", timeZone);
+        claims.put("version", patient.getTokenVersion().intValue());
+        claims.put("role", patient.getRole().toString());
+        claims.put("email", patient.getEmail());
+        claims.put("userId", patient.getId());
+        claims.put("userAdminId", patient.getUser().getId());
 
         return claims;
     }
@@ -113,6 +130,23 @@ public class SecurityUtils {
     }
 
     /**
+     * Retrieves the user's session information from the security context. If the session information is not available, it defaults to null.
+     *
+     * @return the user's session information as a UserSessionModel object
+     */
+    public static UserSessionModel getUserSession() {
+        UserSessionModel userSession = (UserSessionModel) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        if (Objects.nonNull(userSession)) {
+            return userSession;
+        }
+        return null;
+    }
+
+    /**
      * Decrypts the given encrypted password using the provided RsaKeyService. If decryption fails, it throws a BalanceGlobalException.
      *
      * @param encryptedPassword The encrypted password to be decrypted.
@@ -129,5 +163,24 @@ public class SecurityUtils {
             throw new BalanceGlobalException(Constants.INVALID_CREDENTIALS, HttpStatus.CONFLICT.value());
         }
         return rawPassword;
+    }
+
+    /**
+     * Retrieves the JWT token from the "Authorization" header of the current HTTP request. If the request attributes are not available, it returns null.
+     *
+     * @return the JWT token as a String, or null if the request attributes are not available.
+     */
+    public String getToken() {
+
+        ServletRequestAttributes attributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        if(attributes == null) {
+            return null;
+        }
+
+        HttpServletRequest request = attributes.getRequest();
+
+        return request.getHeader("Authorization");
     }
 }

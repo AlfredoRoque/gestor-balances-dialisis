@@ -1,21 +1,9 @@
 spring:
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
   datasource:
-      url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require
-      username: ${PGUSER}
-      password: ${PGPASSWORD}
-      driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
@@ -31,3 +19,32 @@ server:
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${EXPIRATION_TOKEN}
+
+security:
+  public-paths: "/api/auth/login,/api/auth/validate/mail,/api/auth/public-key,/api/auth/recover/password,/api/users/save,/swagger-ui.html,/swagger-ui/**,/v3/api-docs/**"
+
+subscription:
+  api:
+    host:
+      uri: ${HOST_SUBSCRIPTION_API}
+    create:
+      path: "/api/subscriptions/create"
+    cancel:
+      path: "/api/subscriptions/cancel"
+    change:
+      path: "/api/subscriptions/change-plan"
+    exist:
+      path: "/api/subscriptions/exist-subscription"
+    cards:
+      path: "/api/subscriptions/change-cards"
+    user:
+      path: "/api/subscriptions/users/active"
+
+plan:
+  api:
+    plans:
+      path: "/api/plans"
+
+origin:
+  patterns:
+    path: ${ORIGIN_PATTERN}

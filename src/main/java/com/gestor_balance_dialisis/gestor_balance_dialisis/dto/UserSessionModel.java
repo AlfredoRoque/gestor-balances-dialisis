@@ -38,6 +38,9 @@ public class UserSessionModel implements Serializable {
     @Schema(description = "User email", example = "john_doe@gmail.com")
     private String email;
 
+    @Schema(description = "User admin session id", example = "123")
+    private Integer userAdminId;
+
     @Schema(description = "User role", example = "PATIENT")
     private UserRol role;
 }

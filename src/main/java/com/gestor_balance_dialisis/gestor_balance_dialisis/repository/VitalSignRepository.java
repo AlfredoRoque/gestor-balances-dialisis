@@ -13,4 +13,6 @@ import java.util.List;
 public interface VitalSignRepository extends JpaRepository<VitalSign, Long> {
 
     List<VitalSign> findByUserId(Long userId);
+
+    Integer countByUserId(Long userId);
 }

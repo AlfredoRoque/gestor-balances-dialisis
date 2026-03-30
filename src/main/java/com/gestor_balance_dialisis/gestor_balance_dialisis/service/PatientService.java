@@ -2,9 +2,10 @@ package com.gestor_balance_dialisis.gestor_balance_dialisis.service;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PatientRequest;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PatientResponse;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.SubscriptionDto;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.exception.BalanceGlobalException;
-import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.PatientRepository;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.*;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.security.RsaKeyService;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
@@ -30,6 +31,11 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final RsaKeyService rsaKeyService;
     private final PasswordEncoder passwordEncoder;
+    private final SubscriptionService subscriptionService;
+    private final MedicineDetailRepository medicineDetailRepository;
+    private final VitalSignDetailRepository vitalSignDetailRepository;
+    private final ExtraFluidRepository extraFluidRepository;
+    private final FluidBalanceRepository fluidBalanceRepository;
 
     /**
      * Save a new patient record in the system, returns the saved patient response.
@@ -40,9 +46,18 @@ public class PatientService {
     @Transactional
     public PatientResponse save(PatientRequest patientRequest) {
         log.info(" userId : {}",patientRequest.getUserId());
-        if (patientRepository.findByName(patientRequest.getName()).isPresent()) {
+        if (patientRepository.findByNameAndUserId(patientRequest.getName(),patientRequest.getUserId()).isPresent()) {
             throw new BalanceGlobalException(Constants.PATIENT_ALREADY_EXIST, HttpStatus.CONFLICT.value());
         }
+
+        SubscriptionDto subs = subscriptionService.getSubscription(patientRequest.getUserId());
+        if (!Utility.isSpecialPlan(subs.getPlan().getName())) {
+            if (patientRepository.countByUserId(SecurityUtils.getUserId())>=subs.getPlan().getParametersPlan().getMaxPatient()) {
+                throw new BalanceGlobalException(String.format(Constants.PATIENT_PLAN_LIMIT,
+                        subs.getPlan().getParametersPlan().getMaxPatient(), subs.getPlan().getName(), subs.getPlan().getParametersPlan().getMaxPatient()), HttpStatus.CONFLICT.value());
+            }
+        }
+
         String rawPassword = SecurityUtils.decryptPassword(patientRequest.getPassword(),rsaKeyService);
         return new PatientResponse(patientRepository.save(new Patient(patientRequest,passwordEncoder.encode(rawPassword))));
     }
@@ -87,6 +102,11 @@ public class PatientService {
     @Transactional
     public void deletePatient(Long patientId) {
         log.info("patientId : {}",patientId);
+        Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new BalanceGlobalException(Constants.PATIENT_NOT_FOUND, HttpStatus.NOT_FOUND.value()));
+        medicineDetailRepository.findByPatientId(patient.getId()).forEach(medicineDetail -> medicineDetailRepository.deleteById(medicineDetail.getId()));
+        vitalSignDetailRepository.findByPatientId(patient.getId()).forEach(vitalSignDetail -> vitalSignDetailRepository.deleteById(vitalSignDetail.getId()));
+        extraFluidRepository.findByPatientId(patient.getId()).forEach(extraFluid -> extraFluidRepository.deleteById(extraFluid.getId()));
+        fluidBalanceRepository.findByPatientId(patient.getId()).forEach(fluidBalance -> fluidBalanceRepository.deleteById(fluidBalance.getId()));
         patientRepository.deleteById(patientId);
     }
 
