@@ -82,6 +82,18 @@ public class Utility {
     }
 
     /**
+     * Returns the Instant representing the last day of the previous month at the maximum time (23:59:59.999999999) in the user's time zone.
+     * @return Instant representing the last day of the previous month at the maximum time in the user's time zone.
+     */
+    public static Instant getLastDayOfPreviousMonth() {
+        Instant instant = Instant.now();
+        ZoneId zone = SecurityUtils.getUserZone();
+        LocalDate date = instant.atZone(zone).toLocalDate();
+        LocalDate lastDayPrevMonth = date.withDayOfMonth(1).minusDays(1);
+        return endDay(lastDayPrevMonth.atTime(LocalTime.MAX).atZone(zone).toInstant());
+    }
+
+    /**
      * Subtracts a specified number of days from the given Instant and returns the resulting Instant.
      * @param days days to subtract from the given Instant.
      * @param lastDay the Instant from which to subtract the specified number of days.

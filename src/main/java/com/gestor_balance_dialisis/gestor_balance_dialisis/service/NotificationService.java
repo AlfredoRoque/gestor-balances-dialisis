@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
@@ -31,16 +30,18 @@ public class NotificationService {
         log.info("Start notificationCleanBalancesForUser for userId: {}", SecurityUtils.getUserId());
         Instant actualDay = Utility.startDay(Instant.now()).plus(1, ChronoUnit.MINUTES);
         Instant lastDay = Utility.getLastDayOfMonth();
+        Instant lastDayOfPreviousMonth = Utility.getLastDayOfPreviousMonth();
         Instant dateForNotification = Utility.startDay(Utility.minusDays(Constants.DAYS_BEFORE_CLEAN_BALANCES, lastDay));
         Instant lastDayOfBeforeMonth = Utility.getLastDayOfMonth().atZone(SecurityUtils.getUserZone()).minusMonths(1).toInstant();
 
         if(actualDay.isAfter(dateForNotification) && actualDay.isBefore(lastDay)){
+            // Estamos en los últimos 5 días del mes → notificar
             return new NotificationResponseDto(true,
                     String.format(Constants.MESSAGE_NOTIFICATION_FOR_CLEAN_HISTORY,
                             lastDayOfBeforeMonth.atZone(SecurityUtils.getUserZone()).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-        }else if(actualDay.isAfter(lastDay)){
-            //clean balances if period for backup expire
-            fluidBalanceService.cleanFluidBalanceForPatientAndUser(SecurityUtils.getUserId(),actualDay);
+        } else if(actualDay.isAfter(lastDayOfPreviousMonth)){
+            // Ya pasó el último día del mes anterior → limpiar balances
+            fluidBalanceService.cleanFluidBalanceForPatientAndUser(SecurityUtils.getUserId(), actualDay);
         }
         return new NotificationResponseDto(false);
     }
