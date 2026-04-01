@@ -61,6 +61,9 @@ public class User {
     @Column(name = "sesion_version", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long tokenVersion = 0L;
 
+    @Column(name = "ultima_limpieza")
+    private Instant lastCleanDate;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Patient> patients = new ArrayList<>();

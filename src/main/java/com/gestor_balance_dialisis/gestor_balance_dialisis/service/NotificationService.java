@@ -1,9 +1,11 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.service;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.NotificationResponseDto;
+import com.gestor_balance_dialisis.gestor_balance_dialisis.repository.UserRepository;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,11 +23,13 @@ import java.time.temporal.ChronoUnit;
 public class NotificationService {
 
     private final FluidBalanceService fluidBalanceService;
+    private final UserRepository userRepository;
 
     /**
      * Check if the user should receive a notification to clean balances based on the current date and the last day of the month.
      * @return NotificationResponseDto indicating whether the user should receive a notification and the message to be displayed if applicable.
      */
+    @Transactional
     public NotificationResponseDto notificationCleanBalancesForUser(){
         log.info("Start notificationCleanBalancesForUser for userId: {}", SecurityUtils.getUserId());
         Instant actualDay = Utility.startDay(Instant.now()).plus(1, ChronoUnit.MINUTES);
@@ -35,13 +39,25 @@ public class NotificationService {
         Instant lastDayOfBeforeMonth = Utility.getLastDayOfMonth().atZone(SecurityUtils.getUserZone()).minusMonths(1).toInstant();
 
         if(actualDay.isAfter(dateForNotification) && actualDay.isBefore(lastDay)){
+            log.info("Send notification clean balance for userId: {}", SecurityUtils.getUserId());
             // Estamos en los últimos 5 días del mes → notificar
             return new NotificationResponseDto(true,
                     String.format(Constants.MESSAGE_NOTIFICATION_FOR_CLEAN_HISTORY,
                             lastDayOfBeforeMonth.atZone(SecurityUtils.getUserZone()).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
         } else if(actualDay.isAfter(lastDayOfPreviousMonth)){
-            // Ya pasó el último día del mes anterior → limpiar balances
-            fluidBalanceService.cleanFluidBalanceForPatientAndUser(SecurityUtils.getUserId(), actualDay);
+            // Ya pasó el último día del mes anterior → limpiar balances solo una vez por ciclo
+            userRepository.findById(SecurityUtils.getUserId()).ifPresent(user -> {
+                boolean alreadyCleaned = user.getLastCleanDate() != null
+                        && user.getLastCleanDate().isAfter(lastDayOfPreviousMonth);
+                if (!alreadyCleaned) {
+                    log.info("Executing balance cleanup for userId: {}", user.getId());
+                    fluidBalanceService.cleanFluidBalanceForPatientAndUser(user.getId(), actualDay);
+                    user.setLastCleanDate(actualDay);
+                    userRepository.save(user);
+                } else {
+                    log.info("Balance cleanup already executed this cycle for userId: {}", user.getId());
+                }
+            });
         }
         return new NotificationResponseDto(false);
     }
