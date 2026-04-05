@@ -4,16 +4,17 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.dto.PaymentSubscripti
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 /**
- * Service for handling remote calls to the payment API for subscription management, including creating, canceling, and changing subscriptions, as well as updating card information.
+ * Service for handling remote calls to the payment API for subscription management,
+ * including creating, canceling, and changing subscriptions, as well as updating card information.
  */
 @RequiredArgsConstructor
 @Service
 public class PaymentRemoteService {
 
-    private final WebClient webClient;
+    private final RestClient restClient;
 
     @Value("${subscription.api.create.path}")
     private String CREATE_PAYMENT;
@@ -33,14 +34,13 @@ public class PaymentRemoteService {
      * @return A PaymentSubscriptionResponseDto containing details about the created subscription, such as status, next billing date, and any relevant messages.
      */
     public PaymentSubscriptionResponseDto createSubscription(String priceId) {
-        return webClient.post()
+        return restClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path(CREATE_PAYMENT)
                         .queryParam("priceId", priceId)
                         .build())
                 .retrieve()
-                .bodyToMono(PaymentSubscriptionResponseDto.class)
-                .block();
+                .body(PaymentSubscriptionResponseDto.class);
     }
 
     /**
@@ -48,13 +48,12 @@ public class PaymentRemoteService {
      * @return A PaymentSubscriptionResponseDto containing details about the cancellation, such as status and any relevant messages.
      */
     public PaymentSubscriptionResponseDto cancelSubscription() {
-        return  webClient.post()
+        return restClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path(CANCEL_PAYMENT)
                         .build())
                 .retrieve()
-                .bodyToMono(PaymentSubscriptionResponseDto.class)
-                .block();
+                .body(PaymentSubscriptionResponseDto.class);
     }
 
     /**
@@ -63,14 +62,13 @@ public class PaymentRemoteService {
      * @return A PaymentSubscriptionResponseDto containing details about the updated subscription, such as status, next billing date, and any relevant messages.
      */
     public PaymentSubscriptionResponseDto changeSubscription(String newPriceId) {
-        return webClient.post()
+        return restClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path(CHANGE_SUBSCRIPTION_PLAN)
                         .queryParam("newPriceId", newPriceId)
                         .build())
                 .retrieve()
-                .bodyToMono(PaymentSubscriptionResponseDto.class)
-                .block();
+                .body(PaymentSubscriptionResponseDto.class);
     }
 
     /**
@@ -78,12 +76,11 @@ public class PaymentRemoteService {
      * @return A PaymentSubscriptionResponseDto containing details about the card update, such as status and any relevant messages.
      */
     public PaymentSubscriptionResponseDto changeCards() {
-        return webClient.post()
+        return restClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path(CHANGE_CARDS)
                         .build())
                 .retrieve()
-                .bodyToMono(PaymentSubscriptionResponseDto.class)
-                .block();
+                .body(PaymentSubscriptionResponseDto.class);
     }
 }

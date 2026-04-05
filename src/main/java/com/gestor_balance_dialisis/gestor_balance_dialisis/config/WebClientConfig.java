@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 /**
- * Configuration class for setting up the WebClient used to communicate with external services, specifically the subscription API.
- * It includes the base URL for the subscription API and applies a JWT propagation filter to ensure that authentication tokens are included in outgoing requests.
+ * Configuration class for setting up the RestClient used to communicate with external services.
+ * Applies a JWT propagation interceptor to ensure authentication tokens are included in outgoing requests.
  */
 @RequiredArgsConstructor
 @Configuration
@@ -21,15 +21,15 @@ public class WebClientConfig {
     private final JwtPropagationFilter jwtPropagationFilter;
 
     /**
-     * Creates and configures a WebClient bean with the base URL for the subscription API and applies the JWT propagation filter to ensure that authentication tokens are included in outgoing requests.
-     * @return a configured WebClient instance ready to be used for making HTTP requests to the subscription API.
+     * Creates and configures a RestClient bean with the base URL for the subscription API
+     * and applies the JWT propagation interceptor.
+     * @return a configured RestClient instance ready to be used for making HTTP requests.
      */
     @Bean
-    public WebClient webClient() {
-        return WebClient.builder()
+    public RestClient restClient() {
+        return RestClient.builder()
                 .baseUrl(HOST_PAYMENT)
-                .filter(jwtPropagationFilter.jwtFilter())
+                .requestInterceptor(jwtPropagationFilter)
                 .build();
     }
-
 }
