@@ -12,7 +12,6 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.security.RsaKeyServic
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Constants;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.SecurityUtils;
 import com.gestor_balance_dialisis.gestor_balance_dialisis.util.Utility;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -103,7 +102,7 @@ public class AuthService {
      * @throws BalanceGlobalException if the email does not exist.
      */
     @Async
-    public void recoverPassword(String email) throws MessagingException {
+    public void recoverPassword(String email) {
         log.info("for {}: ",email);
         Optional<User> user = userRepository.findByEmail(email);
         user.orElseThrow(() -> new BalanceGlobalException(Constants.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value()));

@@ -117,6 +117,7 @@ public class PatientService {
      * @return The patient response if the patient is found.
      * @throws BalanceGlobalException if the patient is not found.
      */
+    @Transactional
     public PatientResponse findById(Long patientId) {
         log.info("patientId: {}",patientId);
         Optional<Patient> patient = patientRepository.findById(patientId);

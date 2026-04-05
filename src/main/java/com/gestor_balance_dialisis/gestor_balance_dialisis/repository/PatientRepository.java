@@ -1,6 +1,7 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.repository;
 
 import com.gestor_balance_dialisis.gestor_balance_dialisis.entity.Patient;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +15,11 @@ import java.util.Optional;
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
+    @EntityGraph(attributePaths = {"user", "bagType"})
     List<Patient> findByUserId(Long id);
+
+    @EntityGraph(attributePaths = {"user", "bagType"})
+    Optional<Patient> findById(Long id);
 
     List<Patient> findByName(String name);
 

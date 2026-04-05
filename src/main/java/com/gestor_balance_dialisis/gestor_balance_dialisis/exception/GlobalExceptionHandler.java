@@ -1,6 +1,6 @@
 package com.gestor_balance_dialisis.gestor_balance_dialisis.exception;
 
-import jakarta.mail.MessagingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,6 +16,7 @@ import java.util.Map;
  * Global exception handler for the application.
  * Handles validation errors, custom exceptions, email sending errors, and SQL exceptions.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -55,23 +56,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles email sending errors and returns a response entity containing the error code and message.
-     *
-     * @param ex The exception containing email sending errors.
-     * @return A response entity containing the error code and message.
-     */
-    @ExceptionHandler(MessagingException.class)
-    public ResponseEntity<Map<String, Object>> handleEmailException(MessagingException ex) {
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("code", HttpStatus.CONFLICT.value());
-        response.put("message", "Error sending email.");
-
-        return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(response);
-    }
-
-    /**
      * Handles SQL exceptions and returns a response entity containing the error code and message.
      *
      * @param ex The exception containing SQL errors.
@@ -86,5 +70,20 @@ public class GlobalExceptionHandler {
         response.put("message", "Error to register, update or get user information, try again later.");
 
         return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(response);
+    }
+
+    /**
+     * Handles email sending errors and returns a response entity containing the error code and message.
+     *
+     * @param ex The exception thrown during email operations.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        log.info("An unexpected error occurred", ex);
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("code", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.put("message", "An unexpected error occurred.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
