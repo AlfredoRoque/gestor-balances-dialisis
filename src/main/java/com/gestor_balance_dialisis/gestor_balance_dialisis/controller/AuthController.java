@@ -6,7 +6,6 @@ import com.gestor_balance_dialisis.gestor_balance_dialisis.security.RsaKeyServic
 import com.gestor_balance_dialisis.gestor_balance_dialisis.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -86,7 +85,7 @@ public class AuthController {
             description = "Recover password for a user, returns true if the email exists and the recovery process is initiated, otherwise throws an exception."
     )
     @GetMapping("/recover/password")
-    public ResponseEntity<Void> recoverPassword(@RequestParam String email) throws MessagingException {
+    public ResponseEntity<Void> recoverPassword(@RequestParam String email) {
         authService.recoverPassword(email);
         return ResponseEntity.noContent().build();
     }
