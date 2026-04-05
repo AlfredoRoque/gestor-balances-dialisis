@@ -18,6 +18,9 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     @EntityGraph(attributePaths = {"user", "bagType"})
     List<Patient> findByUserId(Long id);
 
+    @EntityGraph(attributePaths = {"user", "bagType"})
+    Optional<Patient> findById(Long id);
+
     List<Patient> findByName(String name);
 
     Optional<Patient> findByNameAndUserId(String name, Long userId);
