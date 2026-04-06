@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+
+jwt:
+  secret: test
+  expiration: 3600
+
+security:
+  public-paths: "/api/auth/login,/api/auth/validate/mail,/api/auth/public-key,/api/auth/recover/password,/api/users/save,/swagger-ui.html,/swagger-ui/**,/v3/api-docs/**"
+
+subscription:
+  api:
+    host:
+      uri: "http://localhost:8084"
+    create:
+      path: "/api/subscriptions/create"
+    cancel:
+      path: "/api/subscriptions/cancel"
+    change:
+      path: "/api/subscriptions/change-plan"
+    exist:
+      path: "/api/subscriptions/exist-subscription"
+    cards:
+      path: "/api/subscriptions/change-cards"
+    user:
+      path: "/api/subscriptions/users/active"
+
+plan:
+  api:
+    plans:
+      path: "/api/plans"
+
+origin:
+  patterns:
+    path: "*"
